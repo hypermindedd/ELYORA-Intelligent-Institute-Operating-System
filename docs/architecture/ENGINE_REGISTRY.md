@@ -31,3 +31,23 @@ E01 visual: shared brand DNA, distinct UI. E02 journey: only official compatible
 
 ## Machine-readable manifest
 `engines/registry.v1.json` records owner, single source of truth, proposed inbound/outbound contract, allowed state writes, allowed engine dependencies, parent reuse, classification and explicit status for each I01–I20. Run `npm run check` to validate count, naming, mandatory fields, dependency DAG and ELYORA protected-state write prohibitions. **IN DESIGN means no claim of operational deployment.**
+
+## P0 source audit and contract gaps — 2026-11-08
+
+This section distinguishes code evidence at `ac8401b3c9ccab8e5cf0a52aea5ed00d4628f541` from the operational design statuses in the versioned manifest. The manifest is the source for dependency edges and the allowed-write list. An offline component can exist while the complete engine remains IN DESIGN / NOT_CONNECTED. [Audit and evidence](AS_IS_AUDIT.md) · [Source-of-truth map](SOURCE_OF_TRUTH_MAP.md)
+
+| IDs | Evidence at the audited SHA | Required contract or dependency |
+| --- | --- | --- |
+| I01, I04, I05, I06 | IMPLEMENTED in part. Pure actor/tenant/assignment policy, directive scope and timebox functions. Operational identity and institutional data stores PLANNED. | Trusted server identity, membership and resource state, revocation/expiry, durable directive and authoritative time source. |
+| I02, I03 | I03 has an IMPLEMENTED fail-closed adapter, verified by offline demo. Durable workflow/orchestration is PLANNED. | Official version-pinned ELYORA port and evidence, idempotent command/outbox and retry/error policy. Keep ELYORA closed until authorized staging verification. |
+| I07, I08, I09 | I07 modeled offline, I09 cabin UX is an offline preview. I08 is a protected BUILD-23 reference and needs reconciliation. | Signed media access, room event and privacy contracts, authoritative academic session/attendance evidence and role-specific storage. |
+| I10, I11, I20 | IMPLEMENTED in part. Offline human qualification decision, provisional language catalog, and activity scope checks. Live assessment and localized pedagogy are PLANNED. | Approved rubrics and voice/consent retention, human reviewer workflow, launch language selection and per-language ELYORA compatibility. |
+| I12, I13, I19 | IMPLEMENTED in part. Offline recommendation/action/measurement functions and scoped aggregate projection. Connected analytics and intervention lifecycle are PLANNED. | Provenance and confidence for signals, durable assignments and measured outcomes, safe projections and cohort thresholds. |
+| I14, I15, I16, I18 | PLANNED at operational level. Existing registry entries and dependency declarations describe design. | Consent and communication scope, eligibility/matching, ledger and payment controls, scoped tool approval, budget and audit. |
+| I17 | VERIFIED offline within defined workflow scope. PQE ran in advisory mode with skips. | Ratified quality gates, complete security/contract regression evidence and separately scoped staging and production verification. |
+
+### Integration and decision gates
+
+- Institute owns the Institute-specific commands and records in the map. Only the official ELYORA boundary may change protected educational state. The Parent E01–E15 map above is a reuse inventory from the existing repository, with availability still UNVERIFIED.
+- The observed six schemas are Institute drafts. Structural lint checks structure. Owner/version, realistic example validation, negative cases, compatibility policy and the official parent contract are still required before connected use. [Contract catalog](CONTRACT_CATALOG.md)
+- The first handoff increment is already in open PR #14. Its evidence remains branch-scoped. Durable orchestration, Voice retention, live qualification, launch locale choices, deployment A/B, Guardian and financial flows remain gated. [Source register](../governance/SOURCE_REGISTER.md) · [PR #14](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/pull/14)
