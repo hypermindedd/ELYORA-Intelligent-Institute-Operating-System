@@ -1,0 +1,505 @@
+{
+  "registryId": "EI-OS-ENGINE-REGISTRY",
+  "schemaVersion": 1,
+  "asOf": "2026-11-07",
+  "status": "IN_DESIGN",
+  "meaning": "Conceptual bounded capabilities, not necessarily separately deployed services.",
+  "authoritativeParent": "hypermindedd/Elyora-EnglishMastery",
+  "parentEngineRange": "E01-E15",
+  "engines": [
+    {
+      "id": "I01",
+      "name": "Policy & Authorization",
+      "owner": "Institute",
+      "sourceOfTruth": "InstitutePolicy",
+      "inboundContract": "AuthenticatedActorContextV1 + ResourceMembershipV1",
+      "outboundContract": "AuthorizationDecisionV1",
+      "allowedStateWrites": [],
+      "dependsOn": [],
+      "dataClassification": "restricted",
+      "parentEngineReuse": [
+        "E09"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I02",
+      "name": "Workflow Orchestration",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteWorkflow",
+      "inboundContract": "AuthorizedDomainCommandV1",
+      "outboundContract": "WorkflowResultV1",
+      "allowedStateWrites": [
+        "workflow_state",
+        "transactional_outbox"
+      ],
+      "dependsOn": [
+        "I01"
+      ],
+      "dataClassification": "operational",
+      "parentEngineReuse": [
+        "E02",
+        "E10"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I03",
+      "name": "ELYORA Contracts & Integration",
+      "owner": "InstituteAdapter",
+      "sourceOfTruth": "ELYORA(parent; authoritative external)",
+      "inboundContract": "ScopedActivityRequestV1",
+      "outboundContract": "ELYORAOfficialEvidenceV1",
+      "allowedStateWrites": [],
+      "dependsOn": [
+        "I01",
+        "I05"
+      ],
+      "dataClassification": "student_private",
+      "parentEngineReuse": [
+        "E03",
+        "E04",
+        "E05",
+        "E10",
+        "E12"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I04",
+      "name": "Tenant & Institutional Governance",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteOrganization",
+      "inboundContract": "OrganizationCommandV1",
+      "outboundContract": "MembershipSnapshotV1",
+      "allowedStateWrites": [
+        "tenant",
+        "membership",
+        "class",
+        "enrollment"
+      ],
+      "dependsOn": [
+        "I01"
+      ],
+      "dataClassification": "institution_confidential",
+      "parentEngineReuse": [
+        "E09"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I05",
+      "name": "Learning Scope & Directives",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteDirective",
+      "inboundContract": "LearningScopeDirectiveV1",
+      "outboundContract": "ScopeAuthorizationDecisionV1",
+      "allowedStateWrites": [
+        "approved_scope_directive"
+      ],
+      "dependsOn": [
+        "I01",
+        "I04"
+      ],
+      "dataClassification": "student_private",
+      "parentEngineReuse": [
+        "E03",
+        "E05"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I06",
+      "name": "Calendar & Timebox",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteSchedule",
+      "inboundContract": "CalendarChangeV1",
+      "outboundContract": "ScheduleWindowV1",
+      "allowedStateWrites": [
+        "timetable",
+        "deadline"
+      ],
+      "dependsOn": [
+        "I01",
+        "I04"
+      ],
+      "dataClassification": "operational",
+      "parentEngineReuse": [
+        "E02"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I07",
+      "name": "Virtual Rooms & Presence",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteRoom",
+      "inboundContract": "VirtualRoomV1",
+      "outboundContract": "RoomEligibilityV1",
+      "allowedStateWrites": [
+        "room_metadata"
+      ],
+      "dependsOn": [
+        "I01",
+        "I04",
+        "I06"
+      ],
+      "dataClassification": "institution_confidential",
+      "parentEngineReuse": [
+        "E10"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I08",
+      "name": "Classroom Academic Execution",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteSession(protected BUILD23)",
+      "inboundContract": "AuthorizedSessionCommandV1",
+      "outboundContract": "BUILD23AcademicEventV1",
+      "allowedStateWrites": [
+        "session_lifecycle",
+        "attendance"
+      ],
+      "dependsOn": [
+        "I01",
+        "I07"
+      ],
+      "dataClassification": "student_private",
+      "parentEngineReuse": [
+        "E10"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "PROTECTED_BASELINE_REFERENCE",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I09",
+      "name": "Private Workspaces",
+      "owner": "RoleScopedOwners",
+      "sourceOfTruth": "PrivateWorkspaceOwners",
+      "inboundContract": "AuthenticatedWorkspaceRequestV1",
+      "outboundContract": "ScopedWorkspaceProjectionV1",
+      "allowedStateWrites": [
+        "workspace_preferences"
+      ],
+      "dependsOn": [
+        "I01",
+        "I04"
+      ],
+      "dataClassification": "teacher_private/student_private",
+      "parentEngineReuse": [
+        "E08",
+        "E09"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I10",
+      "name": "Teacher Conversational Qualification",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteEligibility",
+      "inboundContract": "TeacherQualificationCaseV1",
+      "outboundContract": "TeacherEligibilityDecisionV1",
+      "allowedStateWrites": [
+        "teacher_eligibility"
+      ],
+      "dependsOn": [
+        "I01",
+        "I04"
+      ],
+      "dataClassification": "teacher_private",
+      "parentEngineReuse": [
+        "E03",
+        "E04",
+        "E10"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I11",
+      "name": "Multilingual Cultural Adaptation",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteCulturalPolicy",
+      "inboundContract": "CultureAdaptationContextV1",
+      "outboundContract": "CulturalExperienceDirectiveV1",
+      "allowedStateWrites": [
+        "cultural_policies"
+      ],
+      "dependsOn": [
+        "I04"
+      ],
+      "dataClassification": "operational",
+      "parentEngineReuse": [
+        "E06",
+        "E08"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I12",
+      "name": "Continuous Intelligence",
+      "owner": "DerivedIntelligence",
+      "sourceOfTruth": "InstituteDerivedSignals",
+      "inboundContract": "AuthorizedEvidenceEventV1",
+      "outboundContract": "ExplainableRiskSignalV1",
+      "allowedStateWrites": [
+        "derived_intelligence_projection"
+      ],
+      "dependsOn": [
+        "I01",
+        "I04"
+      ],
+      "dataClassification": "derived_restricted",
+      "parentEngineReuse": [
+        "E14"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I13",
+      "name": "Recommendation & Intervention",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteIntervention",
+      "inboundContract": "ExplainableRecommendationV1",
+      "outboundContract": "InterventionLifecycleV1",
+      "allowedStateWrites": [
+        "intervention_state",
+        "measured_outcome"
+      ],
+      "dependsOn": [
+        "I01",
+        "I12"
+      ],
+      "dataClassification": "student_private",
+      "parentEngineReuse": [
+        "E14"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I14",
+      "name": "Communications & Relationship",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteCommunication",
+      "inboundContract": "ScopedCommunicationCommandV1",
+      "outboundContract": "CommunicationDeliveryRecordV1",
+      "allowedStateWrites": [
+        "communication_receipt"
+      ],
+      "dependsOn": [
+        "I01",
+        "I02"
+      ],
+      "dataClassification": "restricted",
+      "parentEngineReuse": [
+        "E08",
+        "E12"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I15",
+      "name": "Workforce & Marketplace",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteStaffing",
+      "inboundContract": "TeacherEligibilityDecisionV1",
+      "outboundContract": "TeacherMatchProposalV1",
+      "allowedStateWrites": [
+        "staffing_assignment"
+      ],
+      "dependsOn": [
+        "I04",
+        "I06",
+        "I10"
+      ],
+      "dataClassification": "institution_confidential",
+      "parentEngineReuse": [
+        "E08"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I16",
+      "name": "Billing & Revenue",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteLedger",
+      "inboundContract": "AuthorizedBillingCommandV1",
+      "outboundContract": "LedgerEntryV1",
+      "allowedStateWrites": [
+        "financial_ledger"
+      ],
+      "dependsOn": [
+        "I01",
+        "I04"
+      ],
+      "dataClassification": "financial",
+      "parentEngineReuse": [
+        "E12"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I17",
+      "name": "QA Evidence & Audit",
+      "owner": "InstituteQuality",
+      "sourceOfTruth": "InstituteAuditEvidence",
+      "inboundContract": "RuntimeEvidenceV1",
+      "outboundContract": "VerificationVerdictV1",
+      "allowedStateWrites": [
+        "audit_evidence"
+      ],
+      "dependsOn": [
+        "I01"
+      ],
+      "dataClassification": "institution_confidential",
+      "parentEngineReuse": [
+        "E13",
+        "E14",
+        "E15"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I18",
+      "name": "AI Agent Orchestration",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteToolPolicies",
+      "inboundContract": "ApprovedAgentActionRequestV1",
+      "outboundContract": "AgentExecutionTraceV1",
+      "allowedStateWrites": [
+        "tool_execution_trace"
+      ],
+      "dependsOn": [
+        "I01",
+        "I02",
+        "I17"
+      ],
+      "dataClassification": "restricted",
+      "parentEngineReuse": [
+        "E11",
+        "E12"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I19",
+      "name": "Executive Analytics",
+      "owner": "DerivedIntelligence",
+      "sourceOfTruth": "InstituteDerivedAnalytics",
+      "inboundContract": "AuthorizedAggregateSignalV1",
+      "outboundContract": "InstituteExecutiveProjectionV1",
+      "allowedStateWrites": [
+        "derived_aggregate_projection"
+      ],
+      "dependsOn": [
+        "I01",
+        "I12"
+      ],
+      "dataClassification": "derived_aggregate",
+      "parentEngineReuse": [
+        "E14"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    },
+    {
+      "id": "I20",
+      "name": "Multilingual Program Catalog",
+      "owner": "Institute",
+      "sourceOfTruth": "InstituteProgramCatalog",
+      "inboundContract": "ProgramCatalogCommandV1",
+      "outboundContract": "ProgramMetadataV1",
+      "allowedStateWrites": [
+        "program_catalog_metadata"
+      ],
+      "dependsOn": [
+        "I04",
+        "I11"
+      ],
+      "dataClassification": "operational",
+      "parentEngineReuse": [
+        "E06",
+        "E07"
+      ],
+      "version": "0.1.0-design",
+      "implementationStatus": "IN_DESIGN",
+      "integrationStatus": "NOT_CONNECTED",
+      "commandPolicy": "SERVER_AUTHORIZATION_REQUIRED",
+      "releaseEvidence": "NOT_VERIFIED"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EI-OS Engine Capability Manifest V1",
+  "description": "Design-time engine metadata; NOT proof of implementation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "owner",
+    "sourceOfTruth",
+    "inboundContract",
+    "outboundContract",
+    "allowedStateWrites",
+    "dependsOn",
+    "parentEngineReuse",
+    "commandPolicy",
+    "dataClassification",
+    "implementationStatus"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^I[0-9]{2}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 2
+    },
+    "sourceOfTruth": {
+      "type": "string",
+      "minLength": 2
+    },
+    "inboundContract": {
+      "type": "string",
+      "minLength": 2
+    },
+    "outboundContract": {
+      "type": "string",
+      "minLength": 2
+    },
+    "allowedStateWrites": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dependsOn": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^I[0-9]{2}$"
+      }
+    },
+    "parentEngineReuse": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^E(0[1-9]|1[0-5])$"
+      }
+    },
+    "commandPolicy": {
+      "const": "SERVER_AUTHORIZATION_REQUIRED"
+    },
+    "dataClassification": {
+      "type": "string"
+    },
+    "implementationStatus": {
+      "type": "string"
+    }
+  }
+}
