@@ -258,7 +258,7 @@ async function boot() {
     const res = await fetch("/api/demo/languages", {cache:"no-store"});
     if (!res.ok) throw Error("Catalog request refused");
     const json = await res.json();
-    if (json.status !== "PROVISIONAL_DEMO_SEED" || !Array.isArray(json.languages) || json.languages.length !== 8) {
+    if (json.status !== "PROVISIONAL_DEMO_SEED" || !Array.isArray(json.languages) || json.languages.length < 8) {
       throw Error("Unapproved or invalid preview catalog");
     }
     state.catalog = json;

@@ -14,3 +14,10 @@ Browser screenshots at desktop 1440px and mobile 390px, accessibility checks, No
 
 ## Asset provenance
 Previous four imagery references were illustrative remote query results, not committed/licensed immutable source assets. The project web preview uses **original first-party SVG scene assets** matching their warm spatial design language until exact official licensed artwork is obtained. Do not claim pixel identity with those search references. Use placeholders only in explicitly marked PREVIEW mode.
+
+## Exact local Work runbook
+1. Git checkout `feat/eight-language-campus-preview`; run `npm run check` and `npm run web`.
+2. Visit `http://127.0.0.1:4173` in Work's browser and check all `data-view` destinations.
+3. Switch `#ui-locale` to English and confirm LTR; switch back to Persian and confirm RTL. Filter eight `#program-language` cards; test narrow screen 390px.
+4. Review the four original scene SVGs for consistency with the visual references; take screenshots, record visual defects without silently changing owner-directed palette.
+5. Existing offline authority checks are NOT sufficient for live use. Do not deploy an auth backend or hook up ELYORA until the relevant contracts are verified.

@@ -31,3 +31,14 @@ test("public catalog projection strips sensitive future/internal qualification f
   assert.equal(Object.hasOwn(proj.languages[0], "internalReviewNotes"), false);
   assert.equal(Object.hasOwn(proj.languages[0], "capabilities"), false);
 });
+
+test("future ninth or additional language does not require platform redesign",()=>{
+ const x=clone();
+ x.languages.push({
+  ...x.languages[0],
+  id:"LANG-09",code:"pt",autonym:"Português",displayNameFa:"پرتغالی",
+  displayNameEn:"Portuguese",script:"Latn",direction:"ltr",plannedLocaleVariants:["pt-PT","pt-BR"]
+ });
+ assert.equal(validateLanguageCatalog(x).valid,true);
+ assert.equal(publicCatalogProjection(x).languages.length,9);
+});

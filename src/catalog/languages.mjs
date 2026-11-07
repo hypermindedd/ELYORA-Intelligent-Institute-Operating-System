@@ -14,8 +14,8 @@ export function validateLanguageCatalog(catalog = languageCatalog) {
     return { valid: false, errors: ["INVALID_CATALOG_STRUCTURE"] };
   }
   if (catalog.plannedLaunchLanguageCount !== 8) errors.push("EIGHT_SLOT_PLAN_MISSING");
-  if (catalog.languages.length !== 8) errors.push("PROVISIONAL_SEED_MUST_HAVE_EIGHT_SLOTS");
-  if (catalog.status !== "PROVISIONAL_DEMO_SEED") errors.push("SEED_MUST_NOT_CLAIM_APPROVAL");
+  if (catalog.languages.length < catalog.plannedLaunchLanguageCount) errors.push("FEWER_THAN_PLANNED_LANGUAGE_SLOTS");
+  if (!["PROVISIONAL_DEMO_SEED","OWNER_CONFIRMED"].includes(catalog.status)) errors.push("INVALID_CATALOG_STATUS");
   if (!Array.isArray(catalog.confirmedLaunchLanguages)) errors.push("CONFIRMATION_FIELD_MISSING");
   const codes = new Set(), ids = new Set();
   for (const entry of catalog.languages) {
@@ -41,6 +41,7 @@ export function validateLanguageCatalog(catalog = languageCatalog) {
   if (!Array.isArray(catalog.uiLocales) || !catalog.uiLocales.some((l) => l.code === "fa-IR" && l.direction === "rtl") ||
       !catalog.uiLocales.some((l) => l.code === "en-US" && l.direction === "ltr")) errors.push("UI_LOCALES_REQUIRED");
   if (catalog.confirmedLaunchLanguages?.some((code) => !codes.has(code))) errors.push("UNREGISTERED_CONFIRMED_LANGUAGE");
+  if (catalog.status === "OWNER_CONFIRMED" && catalog.confirmedLaunchLanguages?.length !== catalog.plannedLaunchLanguageCount) errors.push("CONFIRMED_COUNT_MISMATCH");
   return { valid: errors.length === 0, errors };
 }
 export function resolveLanguage(code, catalog = languageCatalog) {
