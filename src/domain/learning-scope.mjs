@@ -48,7 +48,7 @@ export function approveDirective({ directive, actor, assignment }) {
 }
 
 /** The caller MUST have already independently authenticated and authorized. */
-export function evaluatePracticeAccess({ directive, actor, activity, at }) {
+export function evaluateStudentScope({ directive, actor, at }) {
   const studentAuthority = authorizeStudentIdentity({ actor, tenantId: directive?.tenantId, studentId: directive?.studentId });
   if (!studentAuthority.allowed) return studentAuthority;
   const syntax = validateDirective(directive);
@@ -58,6 +58,12 @@ export function evaluatePracticeAccess({ directive, actor, activity, at }) {
   if (!validTime(at)) return denied("INVALID_REQUEST_TIME");
   const t = Date.parse(at);
   if (t < Date.parse(directive.startsAt) || t >= Date.parse(directive.expiresAt)) return denied("SCOPE_OUTSIDE_TIMEBOX");
+  return { allowed: true, reason: "ACTIVE_STUDENT_SCOPE" };
+}
+
+export function evaluatePracticeAccess({ directive, actor, activity, at }) {
+  const scope = evaluateStudentScope({ directive, actor, at });
+  if (!scope.allowed) return scope;
   if (!activity || !hasId(activity.topicId) || !hasId(activity.activityType) ||
       !hasId(activity.programId) || !Number.isSafeInteger(activity.minutes) || activity.minutes <= 0) return denied("INVALID_ACTIVITY");
   if (activity.programId !== directive.programId) return denied("PROGRAM_DENIED");
