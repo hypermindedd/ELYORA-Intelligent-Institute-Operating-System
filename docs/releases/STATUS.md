@@ -25,3 +25,10 @@ Never update status to PASS based solely on authored tests or documentation.
 
 ## PQE first run (advisory only)
 Workflow https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/actions/runs/42383168460 completed SUCCESS on `28a332aefbc27f02ef37e02eb02658c440329536`; this is NOT a release gate. Secrets scan PASS for 53 files, but API/UI/browser/security dependency and architecture boundary checks were among SKIPPED suites. It reported `GO` because no ratified hard-gate goals and `fail-on: never` (not proof of production readiness). SARIF upload reported an integration-access error despite continue-on-error, requiring code-scanning permission review. Full findings: docs/audits/PQE_FIRST_RUN_2026-11-07.md.
+
+## Eight-language warm campus preview — browser/CI evidence
+- Feature baseline code SHA: `1c42b37fb397de34a2a78623dde0dcdd63928670`.
+- Real CI: https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/actions/runs/42387402158 — Node 22, **40/40 tests**, Chromium browser smoke SUCCESS, 4 scenes + 8 provisional language cards + UI RTL/LTR + filter + modal + 390px no horizontal overflow. PNG evidence artifact `ei-os-campus-visual-evidence`, ID `13580008651`.
+- PREVIEW status: **OFFLINE VERIFIED and BROWSER PREVIEW VERIFIED**, not Work human visual sign-off or connected classroom/staging/production verification.
+- Language choices are PROVISIONAL, not 8 owner-confirmed target languages. Real voice, assessment, live ELYORA educational states remain NOT_CONNECTED.
+- Project Quality Engine remains advisory until owner-approved hard gates and full coverage.

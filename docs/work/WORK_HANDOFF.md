@@ -24,3 +24,6 @@ Previous four imagery references were illustrative remote query results, not com
 
 ## Automated browser evidence (GitHub Actions)
 The feature branch adds `.github/workflows/campus-browser.yml` and `scripts/browser-visual-smoke.mjs`. On PR, GitHub Actions installs an isolated Playwright/Chromium runner to exercise 4 cabins, eight catalog cards, interface switching, language filtering and mobile 390px, then archives PNG screenshots. This is actual browser preview verification, **not** a substitute for Work's full visual/UX review or connected-staging tests.
+
+## Verified browser run
+GitHub Actions browser run: https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/actions/runs/42387402158. Browser smoke succeeded; screenshot bundle `ei-os-campus-visual-evidence` (artifact ID 13580008651). Work should **visually inspect the actual images**, verify visual appeal/asset alignment, accessibility and responsiveness beyond automatic checks; GitHub smoke success is not a human screenshot review or release approval.

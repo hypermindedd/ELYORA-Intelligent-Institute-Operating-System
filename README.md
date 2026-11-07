@@ -53,4 +53,6 @@ npm run web
 
 Use the navigation to switch cabin concepts; language selector filters planned language cards; UI locale toggles Persian RTL/English LTR. All live actions explicitly show a not-connected notice. Source illustration assets are first-party SVG prototypes following the four earlier warm reference visuals, not copies of remote search images. See [visual continuity](docs/architecture/VISUAL_REFERENCE_LOCK.md), [eight-language foundation](docs/architecture/EIGHT_LANGUAGE_FOUNDATION.md) and [Work-mode handoff](docs/work/WORK_HANDOFF.md).
 
-**Status:** Preview implemented on feature branch and awaiting CI/browser evidence; no production login, enrollment, teacher qualification, video, voice, analytics, student data or deployed classroom yet.
+**Status:** Offline campus preview implemented and **40/40 unit/contract/HTTP tests + Chromium browser smoke VERIFIED** on the feature branch (run 42387402158). Human design sign-off and Work visual review remain pending; no production login, enrollment, teacher qualification, video, voice, analytics, student data or deployed classroom yet.
+
+Browser screenshot evidence: [GitHub Actions campus preview run](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/actions/runs/42387402158) (artifact: `ei-os-campus-visual-evidence`).
