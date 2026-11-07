@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-label="Teacher Private Atelier">
+<title>Teacher Private Atelier</title>
+<desc>First-party warm virtual institute illustration, Tiffany turquoise, coral, orange, gold and ivory.</desc>
+
+<defs>
+<linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2df"/><stop offset=".52" stop-color="#fffaf4"/><stop offset="1" stop-color="#d5f7ef"/></linearGradient>
+<linearGradient id="floor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#dbc6aa"/><stop offset=".55" stop-color="#f5e3cd"/><stop offset="1" stop-color="#d4b99a"/></linearGradient>
+<linearGradient id="glass" x1="0" y1="0" x2=".6" y2="1"><stop stop-color="#b6f5e6"/><stop offset=".6" stop-color="#e8ffef"/><stop offset="1" stop-color="#89dacf"/></linearGradient>
+<linearGradient id="turquoise" x1="0" x2="1"><stop stop-color="#6bdfd0"/><stop offset="1" stop-color="#1b9d97"/></linearGradient>
+<linearGradient id="coral" x1="0" x2="1"><stop stop-color="#ffb46c"/><stop offset="1" stop-color="#f36a55"/></linearGradient>
+<linearGradient id="display" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#245d61"/><stop offset="1" stop-color="#123d4a"/></linearGradient>
+<filter id="softshadow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="19"/></filter>
+<filter id="drop"><feDropShadow dx="0" dy="13" stdDeviation="12" flood-color="#6e5a48" flood-opacity=".16"/></filter>
+<pattern id="planks" width="143" height="70" patternUnits="userSpaceOnUse"><path d="M0 68H143M71 0V70" stroke="#bca689" stroke-width="2" opacity=".18"/></pattern>
+</defs>
+<rect width="1200" height="720" fill="url(#wall)"/>
+<path d="M0 472H1200V720H0Z" fill="url(#floor)"/>
+<path d="M0 472H1200V720H0Z" fill="url(#planks)"/>
+<path d="M0 472H1200" stroke="#e7d6bd" stroke-width="9"/>
+<path d="M0 30H1200" stroke="#fffdf7" stroke-width="18" opacity=".8"/>
+<g filter="url(#drop)">
+<rect x="66" y="73" width="356" height="372" rx="28" fill="#fffaf2"/>
+<rect x="84" y="91" width="320" height="335" rx="18" fill="url(#glass)"/>
+<circle cx="324" cy="162" r="47" fill="#ffdf88" opacity=".94"/>
+<path d="M84 341C129 280 160 295 215 340C275 268 332 272 404 333V425H84Z" fill="#9bded2"/>
+<path d="M84 384C170 317 254 345 404 369V425H84Z" fill="#64bcac" opacity=".6"/>
+<path d="M244 91V425" stroke="#fffaf4" stroke-width="12"/>
+<path d="M84 274H404" stroke="#fffaf4" stroke-width="12"/>
+<path d="M84 91V426H404" fill="none" stroke="#fff8ea" stroke-width="9"/>
+</g>
+<g opacity=".7"><ellipse cx="811" cy="668" rx="282" ry="28" fill="#927f65" filter="url(#softshadow)"/></g>
+<g transform="translate(1108 383)">
+<path d="M0 117C-8 70-52 58-76 30" fill="none" stroke="#539783" stroke-width="7"/>
+<path d="M0 117C11 62 53 52 84 3" fill="none" stroke="#539783" stroke-width="7"/>
+<path d="M0 117V-34" fill="none" stroke="#539783" stroke-width="7"/>
+<ellipse cx="-61" cy="30" rx="48" ry="17" transform="rotate(28 -61 30)" fill="#4b9e82"/>
+<ellipse cx="71" cy="9" rx="52" ry="18" transform="rotate(-35 71 9)" fill="#4db59e"/>
+<ellipse cx="-25" cy="-16" rx="55" ry="18" transform="rotate(60 -25 -16)" fill="#65b98f"/>
+<ellipse cx="23" cy="-52" rx="60" ry="17" transform="rotate(-52 23 -52)" fill="#75c6a2"/>
+<path d="M-36 105H40L27 189H-24Z" fill="#f5a66b"/>
+<path d="M-32 115H36" stroke="#f8dfbd" stroke-width="7"/>
+</g>
+<g><circle cx="549" cy="55" r="19" fill="#ffdfa7"/><path d="M549 74V145" stroke="#d1a36b" stroke-width="4"/><path d="M494 143Q549 112 604 143L590 179H508Z" fill="#ffcc73" opacity=".92"/></g>
+
+<g opacity=".84"><rect x="716" y="56" width="309" height="46" rx="23" fill="#fffef7" stroke="#f1e0cf" stroke-width="2"/>
+<circle cx="739" cy="79" r="9" fill="#50d7c7"/><circle cx="753" cy="79" r="6" fill="#ff8a3d"/>
+<text x="775" y="85" font-family="Arial,sans-serif" font-size="20" letter-spacing="4" font-weight="bold" fill="#36736e">ELYORA</text></g>
+
+<ellipse cx="790" cy="607" rx="342" ry="93" fill="#fff0df"/>
+<g filter="url(#drop)">
+<rect x="495" y="173" width="542" height="264" rx="19" fill="#fff8ed" stroke="#d8c5ad" stroke-width="13"/>
+<rect x="521" y="193" width="493" height="220" rx="11" fill="#ecfbf7"/>
+<path d="M551 232H748" stroke="#8ce0d4" stroke-width="12" stroke-linecap="round"/>
+<path d="M551 264H912" stroke="#d7e8df" stroke-width="8" stroke-linecap="round"/>
+<path d="M551 294H867" stroke="#d7e8df" stroke-width="8" stroke-linecap="round"/>
+<rect x="569" y="336" width="129" height="49" rx="17" fill="#f7bd73"/>
+<circle cx="755" cy="357" r="27" fill="#56cfc1"/><path d="M745 357L755 367L771 345" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+</g>
+<g filter="url(#drop)">
+<path d="M529 506H1090L1035 555H579Z" fill="#d49b74"/>
+<rect x="568" y="500" width="516" height="40" rx="17" fill="#e6b389"/>
+<rect x="604" y="544" width="23" height="132" rx="10" fill="#9c7157"/>
+<rect x="1039" y="544" width="23" height="132" rx="10" fill="#9c7157"/>
+<rect x="744" y="411" width="210" height="90" rx="12" fill="#457c78"/>
+<rect x="754" y="419" width="192" height="69" rx="9" fill="#ceeee5"/>
+<circle cx="848" cy="453" r="22" fill="#ffbc6e"/><path d="M804 485H898" stroke="#6ebeb3" stroke-width="7"/>
+<rect x="709" y="488" width="284" height="12" rx="6" fill="#788c7e"/>
+<rect x="621" y="481" width="78" height="12" rx="6" fill="#fff0bf"/>
+<rect x="621" y="467" width="64" height="12" rx="6" fill="#f08c72"/>
+</g>
+<g><rect x="458" y="335" width="31" height="176" rx="14" fill="#d7a879"/><rect x="436" y="288" width="78" height="64" rx="35" fill="#ef8d6e"/></g>
+<g><rect x="606" y="80" width="77" height="105" rx="12" fill="#fff5e0" stroke="#e4c8a3" stroke-width="8"/><path d="M622 148C636 116 655 109 672 143" fill="none" stroke="#56cbbb" stroke-width="8"/></g>
+
+</svg>
