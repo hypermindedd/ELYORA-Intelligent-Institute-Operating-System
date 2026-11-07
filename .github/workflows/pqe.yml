@@ -2,6 +2,15 @@
 # No secrets inherited; release gates are not silently ratified.
 name: EI-OS Project Quality Engine (advisory)
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pqe.yml'
+      - 'src/**'
+      - 'tests/**'
+      - 'contracts/**'
+      - 'package.json'
+  pull_request:
   workflow_dispatch:
 permissions:
   contents: read
