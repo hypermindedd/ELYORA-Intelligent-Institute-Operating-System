@@ -7,7 +7,7 @@ AI-native multilingual and multicultural virtual institute, with human-led teach
 - **Architecture:** IN DESIGN; proposed supplement, not an approved replacement of earlier instructions.
 - **BUILD-23:** historically reported protected baseline; no code copied or modified here.
 - **BUILD-24:** Retention & Institute Intelligence foundation planned/in progress per inherited project instructions.
-- **This repository:** A0/A1 source audit, architecture registration, and P0 offline domain kernel bootstrap. No connected ELYORA integration, backend deployment, or production verification is claimed.
+- **This repository:** A0/A1 source audit + architecture registration, and P0 pure-domain kernel **OFFLINE VERIFIED** (23/23 tests, source SHA a12da0c, 2026-11-07). Advisory PQE ran with incomplete coverage; no connected ELYORA integration, backend deployment, or production verification is claimed.
 - **02S Guided Student:** source repository still describes branch as PLANNED; documentation of intended interfaces is not approval to release it.
 
 ## Read in this order
@@ -38,3 +38,6 @@ The example is explicitly **offline simulation** and never calls ELYORA.
 - [Source audit](docs/audits/SOURCE_AUDIT_2026-11-07.md) separates source evidence from interpretation.
 
 Do not introduce a second Mastery/Learning/Progression engine, grant role/scope from browser input, infer success from documentation, or expose private teacher/student records in management projections.
+
+## Delivery tracking
+[Open engineering issues](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/issues) cover A0/A1 approvals, A2/A3 contracts and infrastructure, A4/A5 rooms/ELYORA integration, A6/A7 qualification/intelligence and PQE hard gates. See [initial PQE findings](docs/audits/PQE_FIRST_RUN_2026-11-07.md).

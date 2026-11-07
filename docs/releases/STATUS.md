@@ -10,7 +10,7 @@
 | Actor identity and authoritative storage | PLANNED | pure domain functions cannot replace backend auth |
 | UI private cabins | PLANNED | room and permissions modeled, no UI shipped |
 | Virtual audio/video | PLANNED | provider and signed credentials pending |
-| PQE agents/skills invocation | NOT VERIFIED | workflow defined; inspect run before claiming pass |
+| PQE advisory workflow | EXECUTED, COVERAGE INCOMPLETE | run 42383168460 succeeded, but many checks SKIPPED and fail-on=never |
 | Connected staging | NOT VERIFIED | no connected system |
 | Connected production | NOT VERIFIED | no production deployment |
 
@@ -22,3 +22,6 @@ Never update status to PASS based solely on authored tests or documentation.
 - Node 22: `npm run check` succeeded: 4 schema **structural lint** results; 23 Node built-in unit tests, 23 pass, 0 fail.
 - `npm run demo` succeeded; ELYORA integration correctly returns `BLOCKED_NOT_CONNECTED`.
 - Scope: **OFFLINE VERIFIED** for pure domain kernel only. No full JSON Schema conformance, no server auth, datastore, live classroom, voice/AI, staging or production test.
+
+## PQE first run (advisory only)
+Workflow https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/actions/runs/42383168460 completed SUCCESS on `28a332aefbc27f02ef37e02eb02658c440329536`; this is NOT a release gate. Secrets scan PASS for 53 files, but API/UI/browser/security dependency and architecture boundary checks were among SKIPPED suites. It reported `GO` because no ratified hard-gate goals and `fail-on: never` (not proof of production readiness). SARIF upload reported an integration-access error despite continue-on-error, requiring code-scanning permission review. Full findings: docs/audits/PQE_FIRST_RUN_2026-11-07.md.
