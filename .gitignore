@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+coverage/
+dist/
+.quality-out/
+.qa/out/
+.DS_Store
+*.log

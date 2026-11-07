@@ -1,0 +1,2 @@
+# EI-OS contract proposals
+All schemas are V1 design drafts, PROPOSED_NON_CANONICAL. They do not authorize direct ELYORA educational state writes. The official ELYORA interface requires separate source owner verification. Schema-file parse and required/unique checks performed by scripts/validate-contracts.mjs are **structural lint**, not a complete JSON Schema conformance test. Full validation library, API/OpenAPI, contract negotiation, idempotency and event consumers belong to phase A2/A3.

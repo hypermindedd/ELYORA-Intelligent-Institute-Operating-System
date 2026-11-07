@@ -1,0 +1,20 @@
+name: EI-OS offline core
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  offline-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline schema structural lint and domain tests
+        run: npm run check
+      - name: Offline vertical slice simulation (no ELYORA)
+        run: npm run demo

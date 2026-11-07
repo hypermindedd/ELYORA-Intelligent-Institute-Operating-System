@@ -1,0 +1,14 @@
+# Optional manual-onboarding of the user's existing Project Quality Engine.
+# No secrets inherited; release gates are not silently ratified.
+name: EI-OS Project Quality Engine (advisory)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  quality:
+    uses: hypermindedd/Project-quallity-engine/.github/workflows/pqe.yml@main
+    with:
+      ai: false
+      fail-on: never

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TeacherQualificationCaseV1",
+  "description": "PROPOSED_NON_CANONICAL independent evidence and human review workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "teacherId",
+    "tenantId",
+    "consentRecorded",
+    "credentialsVerified",
+    "evidence",
+    "reviewerDecision",
+    "expiresAt"
+  ],
+  "properties": {
+    "teacherId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "consentRecorded": {
+      "type": "boolean"
+    },
+    "credentialsVerified": {
+      "type": "boolean"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rubricVersion",
+          "observedBehavior"
+        ],
+        "properties": {
+          "rubricVersion": {
+            "type": "string"
+          },
+          "observedBehavior": {
+            "type": "string"
+          },
+          "criticalError": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "reviewerDecision": {
+      "enum": [
+        "approve",
+        "deny",
+        "request_more_evidence"
+      ]
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

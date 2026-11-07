@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InstituteVirtualRoomV1",
+  "description": "PROPOSED_NON_CANONICAL room metadata; no media credential, attendance or educational state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "roomId",
+    "tenantId",
+    "roomType",
+    "status",
+    "startsAt",
+    "expiresAt"
+  ],
+  "properties": {
+    "roomId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "roomType": {
+      "enum": [
+        "student_private",
+        "teacher_private",
+        "classroom",
+        "institute_command"
+      ]
+    },
+    "status": {
+      "enum": [
+        "active",
+        "paused",
+        "closed"
+      ]
+    },
+    "ownerId": {
+      "type": "string"
+    },
+    "classId": {
+      "type": "string"
+    },
+    "startsAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
