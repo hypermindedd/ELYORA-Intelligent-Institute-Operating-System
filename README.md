@@ -41,3 +41,18 @@ Do not introduce a second Mastery/Learning/Progression engine, grant role/scope 
 
 ## Delivery tracking
 [Open engineering issues](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/issues) cover A0/A1 approvals, A2/A3 contracts and infrastructure, A4/A5 rooms/ELYORA integration, A6/A7 qualification/intelligence and PQE hard gates. See [initial PQE findings](docs/audits/PQE_FIRST_RUN_2026-11-07.md).
+
+## EI-OS Warm Campus — first executable preview (v0.2)
+The four student/teacher/classroom/command spaces are accessible as a **static OFFLINE PREVIEW**, without simulated authentication or live ELYORA integration. Eight illustrative target-language programs are configured separately from Persian/English UI locale, with script/direction and planned regional variants.
+
+```sh
+npm run check
+npm run web
+# open http://127.0.0.1:4173
+```
+
+Use the navigation to switch cabin concepts; language selector filters planned language cards; UI locale toggles Persian RTL/English LTR. All live actions explicitly show a not-connected notice. Source illustration assets are first-party SVG prototypes following the four earlier warm reference visuals, not copies of remote search images. See [visual continuity](docs/architecture/VISUAL_REFERENCE_LOCK.md), [eight-language foundation](docs/architecture/EIGHT_LANGUAGE_FOUNDATION.md) and [Work-mode handoff](docs/work/WORK_HANDOFF.md).
+
+**Status:** Offline campus preview implemented and **40/40 unit/contract/HTTP tests + Chromium browser smoke VERIFIED** on the feature branch (run 42387402158). Human design sign-off and Work visual review remain pending; no production login, enrollment, teacher qualification, video, voice, analytics, student data or deployed classroom yet.
+
+Browser screenshot evidence: [GitHub Actions campus preview run](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/actions/runs/42387402158) (artifact: `ei-os-campus-visual-evidence`).

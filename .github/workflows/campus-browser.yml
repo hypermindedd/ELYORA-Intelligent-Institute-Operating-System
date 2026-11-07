@@ -1,0 +1,35 @@
+
+name: EI-OS campus preview browser evidence
+on:
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'packages/language-catalog/**'
+      - 'scripts/browser-visual-smoke.mjs'
+      - '.github/workflows/campus-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run offline domain checks
+        run: npm run check
+      - name: Install isolated Playwright runner
+        run: npm install --no-save --ignore-scripts playwright@1.57.0
+      - name: Install Chromium with system dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Browser interaction + screenshots
+        run: node scripts/browser-visual-smoke.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ei-os-campus-visual-evidence
+          path: screenshots/
+          if-no-files-found: warn

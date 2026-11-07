@@ -26,3 +26,9 @@ Project Quality Engine (P QE) source: hypermindedd/Project-quallity-engine.
 Its canonical agents: plugin/agents/pqe-auditor.md and plugin/agents/pqe-test-architect.md.
 Its canonical skills: plugin/skills/pqe-onboard, pqe-run, pqe-fix.
 Invoke through the external PQE workflow and tools rather than forking uncontrolled copies of those agents. See docs/audits/AGENTS_SKILLS_REUSE.md.
+
+## Visual and eight-language constraints (2026-11-07 owner direction)
+- Preserve the warm first-party illustrated rooms in `apps/web/assets/`, the Tiffany/coral/orange/yellow/ivory system and the four distinct virtual spaces. See `docs/architecture/VISUAL_REFERENCE_LOCK.md`.
+- UI locale is independent from learning target language, instruction locale, script, direction and dialect. Do not hardcode target-language pedagogical assumptions into the UI or ELYORA adapter.
+- Eight demo catalog slots are NOT an immutable platform capacity or approved set of launch languages. Regional voice and education support remains not verified. Tests must cover a ninth catalog language without rewriting the architecture.
+- Web view switching is PREVIEW ONLY; never interpret client selection as a tenant, role or workspace authorization. All product data belongs behind a later server BFF.
