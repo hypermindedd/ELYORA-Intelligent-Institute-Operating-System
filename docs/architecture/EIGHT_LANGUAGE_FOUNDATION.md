@@ -26,3 +26,6 @@
 8. Connected staging/production evidence and rollback plan for that language.
 
 **Current status:** model + public projection + structural/negative tests implemented; educational runtimes and selected launch languages remain PLANNED.
+
+## Language-specific Institute directives — proposed v2
+`contracts/schemas/learning-scope-directive.v2.schema.json` and `src/domain/language-scoped-activity.mjs` add explicit target language, locale variant, instruction locale, curriculum version and negative tests. These use existing v1 authorization functions without duplicating educational state. Both schema and code are **offline design** only; an authorized server must authenticate actors, persist versioned directive decisions, enforce accumulated learning time, sign provider requests and verify official ELYORA contracts before any real exercise.
