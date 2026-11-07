@@ -1,6 +1,6 @@
 {
   "name": "elyora-intelligent-institute-os",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -11,6 +11,7 @@
     "check": "node scripts/validate-contracts.mjs && node scripts/validate-engine-registry.mjs && npm test",
     "demo": "node examples/vertical-slice.mjs",
     "web": "node apps/web/server.mjs",
-    "test:campus": "node --test tests/campus-preview.test.mjs"
+    "test:campus": "node --test tests/campus-preview.test.mjs",
+    "build:campus": "node scripts/build-campus.mjs"
   }
 }

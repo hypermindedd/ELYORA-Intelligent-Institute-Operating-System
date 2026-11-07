@@ -1,12 +1,18 @@
 
-# Eight-language ecosystem foundation (A1/A2) — 2026-11-07
+# Multilingual ecosystem foundation (A1/A2) — 2026-11-07
 
-**Requirement from owner:** build one virtual institute for eight foreign languages, with an extensible foundation from day one.
+**Initial requirement:** build one virtual institute with an extensible foundation and eight launch slots.
 
-**Important unresolved decision:** The owner specified the number **eight**, but has not formally selected the exact language list. `packages/language-catalog/catalog.v1.json` therefore provides **eight demonstration seeds only**: English, French, German, Spanish, Italian, Arabic, Simplified Chinese, Japanese. They are NOT locked launch languages; `confirmedLaunchLanguages: []`. Replacing demo seeds before launch is configuration/versioned migration, not an architectural rewrite.
+**Preview catalog:** `packages/language-catalog/catalog.v1.json` includes the original English, French, German, Spanish, Italian, Arabic, Simplified Chinese and Japanese programs plus Persian, Korean and Russian. Eleven preview entries coexist with the historical eight-slot launch plan. Launch selection remains pending in `confirmedLaunchLanguages: []`.
+
+| Added preview program | Script | Direction | Planned variant | Specialist review focus |
+| --- | --- | --- | --- | --- |
+| Persian | `Arab` | Right to left | `fa-IR` | Persian orthography and half-spaces, formal and conversational usage |
+| Korean | `Kore` | Left to right | `ko-KR` | Hangul, spacing and speech levels |
+| Russian | `Cyrl` | Left to right | `ru-RU` | Cyrillic, word stress and pronunciation |
 
 ## Correct domain separation
-- User-interface locale `uiLocale` (currently preview Persian RTL + English LTR) is **different** from target language `targetLanguage`.
+- User-interface locale `uiLocale` and target language `targetLanguage` are chosen independently.
 - Source/native/instruction language is **different** from target language (future user preference + policy).
 - Language tag BCP 47, script ISO 15924, explicit direction RTL/LTR, spoken variant and dialect belong in metadata. A country flag is **not** a language identifier.
 - `program` holds a language-specific curriculum and approved proficiency framework version; one shared Mastery implementation is prohibited.
