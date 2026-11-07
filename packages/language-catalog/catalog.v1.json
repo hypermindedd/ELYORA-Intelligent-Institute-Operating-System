@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "registryId": "EI-LANGUAGE-CATALOG",
+  "status": "PROVISIONAL_DEMO_SEED",
+  "plannedLaunchLanguageCount": 8,
+  "confirmedLaunchLanguages": [],
+  "note": "Eight illustrative language program slots, NOT confirmed customer choices or verified education/voice availability.",
+  "uiLocales": [
+    {
+      "code": "fa-IR",
+      "direction": "rtl",
+      "status": "PREVIEW_TRANSLATIONS"
+    },
+    {
+      "code": "en-US",
+      "direction": "ltr",
+      "status": "PREVIEW_TRANSLATIONS"
+    }
+  ],
+  "languages": [
+    {
+      "id": "LANG-01",
+      "code": "en",
+      "autonym": "English",
+      "displayNameFa": "انگلیسی",
+      "displayNameEn": "English",
+      "script": "Latn",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "en-US",
+        "en-GB"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-02",
+      "code": "fr",
+      "autonym": "Français",
+      "displayNameFa": "فرانسوی",
+      "displayNameEn": "French",
+      "script": "Latn",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "fr-FR",
+        "fr-CA"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-03",
+      "code": "de",
+      "autonym": "Deutsch",
+      "displayNameFa": "آلمانی",
+      "displayNameEn": "German",
+      "script": "Latn",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "de-DE",
+        "de-AT"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-04",
+      "code": "es",
+      "autonym": "Español",
+      "displayNameFa": "اسپانیایی",
+      "displayNameEn": "Spanish",
+      "script": "Latn",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "es-ES",
+        "es-MX"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-05",
+      "code": "it",
+      "autonym": "Italiano",
+      "displayNameFa": "ایتالیایی",
+      "displayNameEn": "Italian",
+      "script": "Latn",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "it-IT"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-06",
+      "code": "ar",
+      "autonym": "العربية",
+      "displayNameFa": "عربی",
+      "displayNameEn": "Arabic",
+      "script": "Arab",
+      "direction": "rtl",
+      "plannedLocaleVariants": [
+        "ar-SA",
+        "ar-EG",
+        "ar-MA"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-07",
+      "code": "zh-Hans",
+      "autonym": "简体中文",
+      "displayNameFa": "چینی (ساده‌شده)",
+      "displayNameEn": "Chinese (Simplified)",
+      "script": "Hans",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "zh-Hans-CN",
+        "zh-Hans-SG"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-08",
+      "code": "ja",
+      "autonym": "日本語",
+      "displayNameFa": "ژاپنی",
+      "displayNameEn": "Japanese",
+      "script": "Jpan",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "ja-JP"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    }
+  ]
+}
