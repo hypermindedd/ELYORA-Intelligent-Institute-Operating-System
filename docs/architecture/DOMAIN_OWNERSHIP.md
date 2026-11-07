@@ -15,3 +15,5 @@
 | Official ELYORA contracts / licensed educational capabilities | ELYORA parent | ELYORA adapter | guessing live endpoints from proposed schema |
 
 Every newly added table, event or API must extend this map with a single writer, privacy class and contract. Where the historic BUILD-23 implementation cannot be located, maintain NEEDS_REVIEW rather than rebuilding it.
+
+Guided practice handoff is a composition of current Institute assignment and teacher-approved language scope. The Guided Student application may prepare a bounded request through the adapter. The parent remains the only owner of educational execution and its evidence. See [ADR-EI-007](../adr/ADR-EI-007.md).

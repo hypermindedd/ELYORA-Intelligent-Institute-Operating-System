@@ -11,8 +11,14 @@ export function authorizeTeacherScope({ actor, tenantId, studentId, assignment }
   if (!actor || actor.serverAuthenticated !== true || !actor.actorId) return deny("UNAUTHENTICATED");
   if (!tenantId || !studentId || !assignment) return deny("MISSING_RESOURCE");
   if (actor.role !== "teacher") return deny("ROLE_DENIED");
-  if (actor.tenantId !== tenantId || assignment.tenantId !== tenantId) return deny("TENANT_DENIED");
-  if (assignment.teacherId !== actor.actorId || assignment.studentId !== studentId) return deny("ASSIGNMENT_DENIED");
+  if (actor.tenantId !== tenantId) return deny("TENANT_DENIED");
+  return authorizeActiveAssignment({ assignment, tenantId, teacherId: actor.actorId, studentId });
+}
+
+export function authorizeActiveAssignment({ assignment, tenantId, teacherId, studentId }) {
+  if (!assignment || !tenantId || !teacherId || !studentId) return deny("MISSING_RESOURCE");
+  if (assignment.tenantId !== tenantId) return deny("TENANT_DENIED");
+  if (assignment.teacherId !== teacherId || assignment.studentId !== studentId) return deny("ASSIGNMENT_DENIED");
   if (assignment.status !== "active") return deny("ASSIGNMENT_INACTIVE");
   return allow();
 }

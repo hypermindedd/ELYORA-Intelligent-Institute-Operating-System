@@ -42,3 +42,10 @@ Workflow https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-
 - Quality Engine is advisory. Its offline configuration checks the public preview contracts, access boundaries and response headers. Connected identity, teaching, assessment and voice require their own staging and per-language evidence.
 - Migration: the previous two locale identifiers remain valid. The new browser preference is optional, device-local and validated against the allowlist. Existing API consumers can continue using `/api/demo/languages`.
 - Rollback: revert the v0.3 changeset and regenerate the campus preview from the prior verified source. For the hosted site, restore its previous saved version if the new campus route needs to be withdrawn.
+
+## Institute modular foundation — offline verification
+
+- GitHub base: `ac8401b3c9ccab8e5cf0a52aea5ed00d4628f541`. The [modular blueprint](../architecture/INSTITUTE_MODULAR_BLUEPRINT_FA.md) uses the registered 02T authorities with partial source coverage.
+- `npm run check` on Node 24.22.1: six structural schema checks, one 20-engine registry check and 62 native tests passed. Eighteen tests cover the new guided-practice composition, including revoked assignments, tampered approvals, invalid versions and cross-tenant access.
+- `npm run demo`: teacher approval and student scope resolve within the simulated assignment. The parent integration is `BLOCKED_NOT_CONNECTED`. Its scope is offline policy simulation.
+- This increment runs in memory through an internal application entry point. The version-two policy now rejects version-one data decorated with version-two fields. The existing version-one policy is still available to its original callers. Connected migration remains subject to a reviewed mapping.

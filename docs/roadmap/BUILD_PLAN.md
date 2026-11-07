@@ -18,3 +18,5 @@ Audit -> explicit owner -> source of truth -> data/policy contracts -> events ->
 
 ## First offline vertical slice
 Teacher scope proposal and approval -> student practice access decision -> room entry eligibility -> private/aggregate read models -> blocked ELYORA port by default. No fake external API or claims of instructor/student live product.
+
+For the three-product design, dependencies and build sequence, see [the modular blueprint](../architecture/INSTITUTE_MODULAR_BLUEPRINT_FA.md). This proposal supplements the existing A0–A10 gates.

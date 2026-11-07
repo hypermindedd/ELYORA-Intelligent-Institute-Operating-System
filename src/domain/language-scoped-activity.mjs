@@ -10,6 +10,7 @@ const deny = (reason) => ({ allowed: false, reason });
 export function validateLanguageScopedDirective(directive, catalog = languageCatalog) {
   const basic = validateDirective(directive);
   if (!basic.allowed) return basic;
+  if (directive.version < 2) return deny("LANGUAGE_SCOPE_VERSION_REQUIRED");
   if (!directive.targetLanguageCode || !resolveLanguage(directive.targetLanguageCode, catalog)) {
     return deny("UNREGISTERED_TARGET_LANGUAGE");
   }
