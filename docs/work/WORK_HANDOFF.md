@@ -21,3 +21,6 @@ Previous four imagery references were illustrative remote query results, not com
 3. Switch `#ui-locale` to English and confirm LTR; switch back to Persian and confirm RTL. Filter eight `#program-language` cards; test narrow screen 390px.
 4. Review the four original scene SVGs for consistency with the visual references; take screenshots, record visual defects without silently changing owner-directed palette.
 5. Existing offline authority checks are NOT sufficient for live use. Do not deploy an auth backend or hook up ELYORA until the relevant contracts are verified.
+
+## Automated browser evidence (GitHub Actions)
+The feature branch adds `.github/workflows/campus-browser.yml` and `scripts/browser-visual-smoke.mjs`. On PR, GitHub Actions installs an isolated Playwright/Chromium runner to exercise 4 cabins, eight catalog cards, interface switching, language filtering and mobile 390px, then archives PNG screenshots. This is actual browser preview verification, **not** a substitute for Work's full visual/UX review or connected-staging tests.
