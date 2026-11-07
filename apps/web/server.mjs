@@ -3,18 +3,9 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
-import { publicCatalogProjection } from "../../src/catalog/languages.mjs";
+import { catalogPath, generatedResources, staticResources } from "./preview-resources.mjs";
 
 const root = fileURLToPath(new URL("./", import.meta.url));
-const allowed = new Map([
-  ["/", ["index.html", "text/html; charset=utf-8"]],
-  ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
-  ["/app.mjs", ["app.mjs", "text/javascript; charset=utf-8"]],
-  ["/assets/student-studio.svg", ["assets/student-studio.svg", "image/svg+xml"]],
-  ["/assets/teacher-atelier.svg", ["assets/teacher-atelier.svg", "image/svg+xml"]],
-  ["/assets/live-classroom.svg", ["assets/live-classroom.svg", "image/svg+xml"]],
-  ["/assets/command-center.svg", ["assets/command-center.svg", "image/svg+xml"]]
-]);
 
 const commonHeaders = Object.freeze({
   "Cache-Control": "no-store",
@@ -37,13 +28,14 @@ export function createPreviewServer() {
     if (pathname === "/api/health") {
       return json(res, 200, { status: "ok", mode: "OFFLINE_PREVIEW", liveAuth: false, elyora: "BLOCKED_NOT_CONNECTED" });
     }
-    if (pathname === "/api/demo/languages") return json(res, 200, publicCatalogProjection());
-    const match = allowed.get(pathname);
-    if (!match) return json(res, 404, { error: "NOT_FOUND", preview: true });
+    const generated = generatedResources.get(pathname === "/api/demo/languages" ? catalogPath : pathname);
+    const match = staticResources.get(pathname);
+    if (!generated && !match) return json(res, 404, { error: "NOT_FOUND", preview: true });
     try {
-      const file = resolve(root, match[0]);
-      const bytes = await readFile(file);
-      res.writeHead(200, { ...commonHeaders, "Content-Type": match[1] });
+      const [type, bytes] = generated
+        ? [generated[0], generated[1]()]
+        : [match[1], await readFile(resolve(root, match[0]))];
+      res.writeHead(200, { ...commonHeaders, "Content-Type": type });
       res.end(bytes);
     } catch {
       return json(res, 500, { error: "PREVIEW_ASSET_UNAVAILABLE" });

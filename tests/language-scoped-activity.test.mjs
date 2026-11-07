@@ -35,6 +35,13 @@ test("unknown target language and invalid instruction locale rejected",()=>{
  assert.equal(validateLanguageScopedDirective({...directive,targetLanguageCode:"xx"}).reason,"UNREGISTERED_TARGET_LANGUAGE");
  assert.equal(validateLanguageScopedDirective({...directive,instructionLocale:"not_a_locale"}).reason,"INVALID_INSTRUCTION_LOCALE");
 });
+test("added preview programs accept only their own planned regional variant",()=>{
+ for (const [targetLanguageCode, localeVariant] of [["fa","fa-IR"],["ko","ko-KR"],["ru","ru-RU"]]) {
+  const candidate = {...directive,targetLanguageCode,localeVariant,instructionLocale:"en-US"};
+  assert.equal(validateLanguageScopedDirective(candidate).allowed,true);
+  assert.equal(validateLanguageScopedDirective({...candidate,localeVariant:"de-DE"}).reason,"LANGUAGE_VARIANT_NOT_IN_CATALOG");
+ }
+});
 test("client-forged teacher or cross tenant authorization stays denied",()=>{
  assert.equal(approveLanguageScopedDirective({directive,actor:{...teacher,serverAuthenticated:false},assignment}).allowed,false);
  assert.equal(approveLanguageScopedDirective({directive,actor:{...teacher,tenantId:"other"},assignment}).allowed,false);

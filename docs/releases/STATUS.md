@@ -32,3 +32,13 @@ Workflow https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-
 - PREVIEW status: **OFFLINE VERIFIED and BROWSER PREVIEW VERIFIED**, not Work human visual sign-off or connected classroom/staging/production verification.
 - Language choices are PROVISIONAL, not 8 owner-confirmed target languages. Real voice, assessment, live ELYORA educational states remain NOT_CONNECTED.
 - Project Quality Engine remains advisory until owner-approved hard gates and full coverage.
+
+
+## Multilingual warm campus v0.3 — preview scope
+
+- Interface: Persian and English retained. Arabic, Italian, Spanish, Korean, German, French and Russian added. Persian stays the default.
+- Catalog: the previous eight entries plus Persian, Korean and Russian. All eleven remain provisional. The eight-program launch plan remains unconfirmed.
+- Local verification: Node 24 `npm run check` and real Chromium browser smoke. The browser suite checks all nine locales, four rooms, eleven programs, preview notices, direction, keyboard filtering, preference persistence and narrow mobile viewports.
+- Quality Engine is advisory. Its offline configuration checks the public preview contracts, access boundaries and response headers. Connected identity, teaching, assessment and voice require their own staging and per-language evidence.
+- Migration: the previous two locale identifiers remain valid. The new browser preference is optional, device-local and validated against the allowlist. Existing API consumers can continue using `/api/demo/languages`.
+- Rollback: revert the v0.3 changeset and regenerate the campus preview from the prior verified source. For the hosted site, restore its previous saved version if the new campus route needs to be withdrawn.

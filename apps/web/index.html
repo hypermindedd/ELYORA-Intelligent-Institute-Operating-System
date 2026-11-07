@@ -1,26 +1,26 @@
 
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="fa-IR" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#FFF9F2">
-  <meta name="description" content="ELYORA Intelligent Institute — a warm, multilingual virtual institute. Architecture preview, not a live classroom.">
-  <title>ELYORA · Institute Campus Preview</title>
-  <link rel="stylesheet" href="/styles.css">
-  <script type="module" src="/app.mjs"></script>
+  <meta name="description" content="در پیش‌نمایش مؤسسهٔ الیورا، چهار فضای مجازی و مسیرهای زبانی را مرور کنید.">
+  <title>پردیس الیورا · پیش‌نمایش</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.mjs"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">رفتن به محتوای اصلی</a>
+  <a class="skip-link" data-i18n="skipLink" href="#main">رفتن به محتوای اصلی</a>
   <div class="app-shell">
-    <aside class="sidebar" aria-label="راهبری مؤسسه">
+    <aside class="sidebar" data-i18n-label="instituteNavigation" aria-label="راهبری مؤسسه">
       <div class="identity">
         <div class="identity-mark" aria-hidden="true">E<span>•</span></div>
-        <div><strong>ELYORA</strong><small>INTELLIGENT INSTITUTE</small></div>
+        <div><strong lang="en" dir="ltr">ELYORA</strong><small data-i18n="instituteName">مؤسسهٔ هوشمند</small></div>
       </div>
       <span class="preview-tag"><span class="preview-dot"></span><span data-i18n="preview">پیش‌نمایش معماری</span></span>
       <p class="nav-heading" data-i18n="explore">فضاهای انستیتو</p>
-      <nav id="space-navigation" aria-label="Virtual campus views">
+      <nav id="space-navigation" data-i18n-label="campusNavigation" aria-label="ناوبری فضاهای پردیس">
         <button type="button" data-view="campus" class="nav-item active" aria-current="page"><span class="nav-icon" aria-hidden="true">⌂</span><span data-i18n="campus">پردیس الیورا</span></button>
         <button type="button" data-view="student" class="nav-item"><span class="nav-icon" aria-hidden="true">◉</span><span data-i18n="student">کابین دانشجو</span></button>
         <button type="button" data-view="teacher" class="nav-item"><span class="nav-icon" aria-hidden="true">✧</span><span data-i18n="teacher">آتلیه استاد</span></button>
@@ -31,41 +31,44 @@
         <div class="sidebar-note">
           <span class="soft-orb" aria-hidden="true">✦</span>
           <strong data-i18n="humanLed">استاد رهبر یادگیری است</strong>
-          <p data-i18n="humanLedDetail">هوش مصنوعی همراه است، نه جایگزین.</p>
+          <p data-i18n="humanLedDetail">هوش مصنوعی از استاد در هدایت یادگیری پشتیبانی می‌کند.</p>
         </div>
-        <div class="sidebar-version">EI-OS <span>·</span> 0.2 <span>·</span> DEMO</div>
+        <div class="sidebar-version"><bdi lang="en" dir="ltr">EI-OS · 0.3</bdi><span aria-hidden="true">·</span><span data-i18n="demo">نمایشی</span></div>
       </div>
     </aside>
 
     <div class="layout-body">
       <header class="topbar">
         <div class="topbar-context">
-          <span class="crumb-label" data-i18n="virtualCampus">پردیس مجازی /</span>
+          <span class="crumb-label" data-i18n="virtualCampus">پردیس مجازی</span>
           <strong id="current-location">پردیس الیورا</strong>
         </div>
         <div class="topbar-controls">
           <label class="locale-field"><span data-i18n="uiLanguage">زبان رابط</span>
-            <select id="ui-locale" aria-label="UI language"><option value="fa-IR">فارسی</option><option value="en-US">English</option></select>
+            <select id="ui-locale" data-i18n-label="uiLanguage" aria-label="زبان رابط"><option value="fa-IR" lang="fa-IR" dir="rtl">فارسی</option></select>
           </label>
           <span class="connection-status"><span class="connection-dot"></span><span data-i18n="offlineMode">نمایش آفلاین</span></span>
-          <button class="avatar" type="button" data-action="preview" aria-label="Preview account only">EI</button>
+          <button class="avatar" type="button" data-action="preview" data-i18n-label="previewAccount" aria-label="اطلاعات حساب نمایشی">EI</button>
         </div>
       </header>
 
       <main id="main" tabindex="-1">
-        <div class="loading-frame" role="status">در حال آماده‌سازی نمای پردیس...</div>
+        <div class="loading-frame">
+          <h1 data-i18n="campus">پردیس الیورا</h1>
+          <p data-i18n="loadingCampus" role="status">در حال آماده‌سازی پیش‌نمایش پردیس…</p>
+        </div>
       </main>
       <footer class="site-footer">
-        <span>ELYORA · Intelligent Institute OS</span>
+        <span><bdi lang="en" dir="ltr">ELYORA</bdi> · <span data-i18n="instituteName">مؤسسهٔ هوشمند</span></span>
         <span data-i18n="footerCaution">داده‌ها و فضاها نمایشی‌اند؛ هیچ کلاس زنده یا نتیجه آموزشی واقعی در این نسخه فعال نیست.</span>
       </footer>
     </div>
   </div>
   <dialog id="preview-dialog" aria-labelledby="dialog-title">
     <div class="dialog-ornament" aria-hidden="true">✦</div>
-    <h2 id="dialog-title">پیش‌نمایش قابلیت</h2>
-    <p id="dialog-message"></p>
-    <button id="dialog-close" type="button" class="button-primary">متوجه شدم</button>
+    <h2 id="dialog-title" data-i18n="previewTitle">پیش‌نمایش قابلیت</h2>
+    <p id="dialog-message" data-i18n="previewMessage"></p>
+    <button id="dialog-close" data-i18n="understood" type="button" class="button-primary">متوجه شدم</button>
   </dialog>
 </body>
 </html>

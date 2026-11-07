@@ -4,17 +4,61 @@
   "status": "PROVISIONAL_DEMO_SEED",
   "plannedLaunchLanguageCount": 8,
   "confirmedLaunchLanguages": [],
-  "note": "Eight illustrative language program slots, NOT confirmed customer choices or verified education/voice availability.",
+  "note": "The preview catalog includes eleven illustrative programs. The historical eight-slot launch plan is separate and no language has confirmed education or voice availability.",
   "uiLocales": [
     {
       "code": "fa-IR",
       "direction": "rtl",
-      "status": "PREVIEW_TRANSLATIONS"
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "فارسی"
     },
     {
       "code": "en-US",
       "direction": "ltr",
-      "status": "PREVIEW_TRANSLATIONS"
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "English"
+    },
+    {
+      "code": "ar",
+      "direction": "rtl",
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "العربية"
+    },
+    {
+      "code": "it-IT",
+      "direction": "ltr",
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "Italiano"
+    },
+    {
+      "code": "es-ES",
+      "direction": "ltr",
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "Español"
+    },
+    {
+      "code": "ko-KR",
+      "direction": "ltr",
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "한국어"
+    },
+    {
+      "code": "de-DE",
+      "direction": "ltr",
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "Deutsch"
+    },
+    {
+      "code": "fr-FR",
+      "direction": "ltr",
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "Français"
+    },
+    {
+      "code": "ru-RU",
+      "direction": "ltr",
+      "status": "PREVIEW_TRANSLATIONS",
+      "autonym": "Русский"
     }
   ],
   "languages": [
@@ -245,6 +289,96 @@
       "direction": "ltr",
       "plannedLocaleVariants": [
         "ja-JP"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-09",
+      "code": "fa",
+      "autonym": "فارسی",
+      "displayNameFa": "فارسی",
+      "displayNameEn": "Persian",
+      "script": "Arab",
+      "direction": "rtl",
+      "plannedLocaleVariants": [
+        "fa-IR"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-10",
+      "code": "ko",
+      "autonym": "한국어",
+      "displayNameFa": "کره‌ای",
+      "displayNameEn": "Korean",
+      "script": "Kore",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "ko-KR"
+      ],
+      "program": {
+        "status": "PLANNED",
+        "curriculumVersion": null,
+        "teacherRubricVersion": null,
+        "levelFramework": "UNDECIDED",
+        "cultureReview": "PENDING"
+      },
+      "capabilities": {
+        "chat": "NOT_CONNECTED",
+        "speechRecognition": "NOT_VERIFIED",
+        "speechSynthesis": "NOT_VERIFIED",
+        "adaptiveLessons": "NOT_CONNECTED",
+        "assessment": "NOT_CONNECTED"
+      },
+      "flags": {
+        "needsLocaleSpecificQA": true,
+        "requiresHumanTeacherQualification": true
+      }
+    },
+    {
+      "id": "LANG-11",
+      "code": "ru",
+      "autonym": "Русский",
+      "displayNameFa": "روسی",
+      "displayNameEn": "Russian",
+      "script": "Cyrl",
+      "direction": "ltr",
+      "plannedLocaleVariants": [
+        "ru-RU"
       ],
       "program": {
         "status": "PLANNED",
