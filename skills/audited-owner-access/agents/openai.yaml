@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audited Owner Access"
+  short_description: "Build auditable owner and access controls"
+  default_prompt: "Use $audited-owner-access to design and verify the owner access lifecycle."
