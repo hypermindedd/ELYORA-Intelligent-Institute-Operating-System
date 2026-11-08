@@ -12,6 +12,10 @@ const scopeQuery = `
       'studentId', a.student_id, 'status', a.status) AS assignment
   FROM ei_scope.directive d
   JOIN ei_scope.assignment a USING (tenant_id, teacher_id, student_id)
+  JOIN ei_scope.membership teacher ON teacher.tenant_id = d.tenant_id AND teacher.actor_id = d.teacher_id
+    AND teacher.active AND teacher.role = 'teacher'
+  JOIN ei_scope.membership student ON student.tenant_id = d.tenant_id AND student.actor_id = d.student_id
+    AND student.active AND student.role = 'student'
   WHERE d.tenant_id = $1 AND d.directive_id = $2`;
 
 async function first(client, sql, params) {
@@ -36,7 +40,7 @@ export function createPostgresLearningScopeStore(pool) {
       try {
         return await inPostgresTenant(pool, tenantId, "BEGIN ISOLATION LEVEL SERIALIZABLE", client => work({
           loadActor: ({ actorId }) => first(client, actorQuery + " FOR SHARE", [tenantId, actorId]),
-          loadScope: ({ directiveId }) => first(client, scopeQuery + " FOR UPDATE OF d FOR SHARE OF a",
+          loadScope: ({ directiveId }) => first(client, scopeQuery + " FOR UPDATE OF d FOR SHARE OF a, teacher, student",
             [tenantId, directiveId]),
           async putScope({ directive, revision }) {
             const result = await client.query(`

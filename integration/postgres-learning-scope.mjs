@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { after, before, test } from "node:test";
 import pg from "pg";
+import { createPostgresProductOwnerHandler } from "../src/adapters/postgres-product-owner.mjs";
 import { createPostgresScopeInvalidationPublisher } from "../src/adapters/postgres-scope-invalidation.mjs";
 import { createPostgresScopeOutboxWorker } from "../src/adapters/postgres-scope-outbox.mjs";
 import { createPostgresLearningScopeHandler } from "../src/adapters/postgres-learning-scope.mjs";
@@ -24,6 +25,10 @@ const sinkUrl = new URL(appUrl);
 sinkUrl.username = "ei_invalidation_test";
 sinkUrl.password = "ei_invalidation_test";
 const sinkPool = new pg.Pool({ connectionString: sinkUrl.toString() });
+const ownerUrl = new URL(appUrl);
+ownerUrl.username = "ei_owner_test";
+ownerUrl.password = "ei_owner_test";
+const ownerPool = new pg.Pool({ connectionString: ownerUrl.toString() });
 const now = Date.parse("2026-11-08T08:30:00Z");
 const endpoint = "https://institute.test/api/v1/learning-scopes/";
 
@@ -33,6 +38,8 @@ const principalByToken = new Map([
   ["teacher-b", { tenantId: "tenant-b", subject: "teacher" }],
   ["teacher-work", { tenantId: "tenant-work", subject: "teacher" }],
   ["teacher-other", { tenantId: "tenant-other", subject: "teacher" }],
+  ["teacher-owner-tenant", { tenantId: "tenant-owner", subject: "teacher" }],
+  ["student-owner-tenant", { tenantId: "tenant-owner", subject: "student" }],
   ["manager-a", { tenantId: "tenant-a", subject: "manager", role: "teacher" }],
 ]);
 const handler = createPostgresLearningScopeHandler({
@@ -64,7 +71,7 @@ async function seed(tenantId, directiveId) {
 }
 
 before(async () => {
-  for (const migration of ["001_learning_scope.sql", "002_learning_scope_outbox_delivery.sql"]) {
+  for (const migration of ["001_learning_scope.sql", "002_learning_scope_outbox_delivery.sql", "003_product_owner_membership.sql"]) {
     await admin.query(readFileSync(new URL("../db/migrations/" + migration, import.meta.url), "utf8"));
   }
   await admin.query(`
@@ -86,17 +93,25 @@ before(async () => {
     GRANT USAGE ON SCHEMA ei_scope TO ei_invalidation_test;
     GRANT INSERT ON ei_scope.scope_invalidation TO ei_invalidation_test;
 
-    INSERT INTO ei_scope.membership VALUES
+    CREATE ROLE ei_owner_test LOGIN PASSWORD 'ei_owner_test' NOSUPERUSER NOBYPASSRLS;
+    GRANT USAGE ON SCHEMA ei_scope TO ei_owner_test;
+    GRANT SELECT ON ei_scope.membership TO ei_owner_test;
+    GRANT UPDATE (role, active, revision) ON ei_scope.membership TO ei_owner_test;
+    GRANT INSERT ON ei_scope.membership_audit TO ei_owner_test;
+
+    INSERT INTO ei_scope.membership (tenant_id, actor_id, role, active) VALUES
       ('tenant-a', 'teacher', 'teacher', true), ('tenant-a', 'student', 'student', true),
       ('tenant-a', 'manager', 'institute_manager', true),
       ('tenant-b', 'teacher', 'teacher', true), ('tenant-b', 'student', 'student', true),
       ('tenant-work', 'teacher', 'teacher', true), ('tenant-work', 'student', 'student', true),
-      ('tenant-other', 'teacher', 'teacher', true), ('tenant-other', 'student', 'student', true);
+      ('tenant-other', 'teacher', 'teacher', true), ('tenant-other', 'student', 'student', true),
+      ('tenant-owner', 'teacher', 'teacher', true), ('tenant-owner', 'student', 'student', true);
     INSERT INTO ei_scope.assignment VALUES
       ('tenant-a', 'teacher', 'student', 'a0', 'active'),
       ('tenant-b', 'teacher', 'student', 'b0', 'active'),
       ('tenant-work', 'teacher', 'student', 'w0', 'active'),
-      ('tenant-other', 'teacher', 'student', 'o0', 'active');
+      ('tenant-other', 'teacher', 'student', 'o0', 'active'),
+      ('tenant-owner', 'teacher', 'student', 'own0', 'active');
 
     CREATE FUNCTION ei_scope.reject_fixture_event() RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
@@ -108,6 +123,16 @@ before(async () => {
     $$;
     CREATE TRIGGER reject_fixture_event BEFORE INSERT ON ei_scope.outbox
     FOR EACH ROW EXECUTE FUNCTION ei_scope.reject_fixture_event();
+    CREATE FUNCTION ei_scope.reject_fixture_audit() RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN
+      IF NEW.tenant_id = 'tenant-owner' AND NEW.actor_id = 'student' THEN
+        RAISE EXCEPTION 'injected audit failure';
+      END IF;
+      RETURN NEW;
+    END;
+    $$;
+    CREATE TRIGGER reject_fixture_audit BEFORE INSERT ON ei_scope.membership_audit
+    FOR EACH ROW EXECUTE FUNCTION ei_scope.reject_fixture_audit();
   `);
   await seed("tenant-a", "scope-shared");
   await seed("tenant-b", "scope-shared");
@@ -118,9 +143,10 @@ before(async () => {
     await seed("tenant-work", id);
   }
   await seed("tenant-other", "scope-delivery");
+  await seed("tenant-owner", "scope-owner");
 });
 
-after(async () => { await Promise.all([admin.end(), pool.end(), workerPool.end(), sinkPool.end()]); });
+after(async () => { await Promise.all([admin.end(), pool.end(), workerPool.end(), sinkPool.end(), ownerPool.end()]); });
 
 test("tenant keys, row policies, and role-specific API views isolate the same directive ID", async () => {
   assert.equal((await pool.query("SELECT * FROM ei_scope.directive")).rowCount, 0);
@@ -273,4 +299,77 @@ test("known failures and expired final leases become terminal", async () => {
     WHERE tenant_id = 'tenant-work' AND envelope->'payload'->>'directiveId' IN ('scope-dead', 'scope-expired-last')`);
   assert.equal(rows.length, 2);
   assert.ok(rows.every(row => row.dead_lettered_at && row.lease_token === null));
+});
+
+const ownerHandler = createPostgresProductOwnerHandler({
+  pool: ownerPool, ownerSubject: "verified-owner",
+  verifyBearer: async token => {
+    if (token === "owner" || token === "old-session") return {
+      subject: "verified-owner", stepUpVerified: token === "owner"
+    };
+    if (token === "manager") return { subject: "manager", stepUpVerified: true, role: "product_owner" };
+    return null;
+  },
+});
+
+function ownerCall({ tenant = "tenant-owner", actorId = "teacher", token = "owner", revision, policy } = {}) {
+  const headers = { Authorization: "Bearer " + token, "X-Role": "product_owner", "X-Owner": "verified-owner" };
+  if (revision) headers["If-Match"] = revision;
+  if (policy) headers["Content-Type"] = "application/json";
+  return ownerHandler(new Request(endpoint.replace("learning-scopes/", "owner/tenants/") + tenant + "/memberships/" + actorId, {
+    method: policy ? "PUT" : "GET", headers, body: policy ? JSON.stringify(policy) : undefined
+  }));
+}
+
+test("only the bound and stepped-up owner may change policy, with atomic audit and immediate scope restriction", async () => {
+  assert.equal((await ownerCall({ token: "manager" })).status, 404);
+  assert.equal((await ownerCall({ token: "old-session" })).status, 403);
+  assert.equal((await ownerCall({ token: "unknown" })).status, 401);
+  assert.equal((await ownerCall({ tenant: "missing" })).status, 404);
+  assert.equal((await call("scope-owner", "teacher-owner-tenant", "approval", '"r0"')).status, 204);
+  assert.equal((await call("scope-owner", "student-owner-tenant")).status, 200);
+  const current = await ownerCall();
+  assert.equal(current.status, 200);
+  const revision = current.headers.get("ETag");
+  assert.equal((await ownerCall({ policy: { role: "teacher", active: false } })).status, 428);
+  assert.equal((await ownerCall({ revision, policy: { role: "product_owner", active: true } })).status, 400);
+  assert.equal((await ownerCall({ revision, policy: { role: "teacher", active: true, subject: "forged" } })).status, 400);
+
+  const suspended = await ownerCall({ revision, policy: { role: "teacher", active: false } });
+  assert.equal(suspended.status, 200);
+  const result = await suspended.json();
+  assert.deepEqual(result.membership, { tenantId: "tenant-owner", actorId: "teacher", role: "teacher", active: false });
+  assert.equal(result.requestId, suspended.headers.get("X-Request-Id"));
+  assert.equal((await call("scope-owner", "student-owner-tenant")).status, 404);
+  assert.equal((await call("scope-owner", "teacher-owner-tenant")).status, 401);
+  assert.equal((await ownerCall({ revision, policy: { role: "teacher", active: true } })).status, 412);
+
+  const changed = await ownerCall({ revision: suspended.headers.get("ETag"), policy: { role: "institute_manager", active: true } });
+  assert.equal(changed.status, 200);
+  assert.equal((await call("scope-owner", "student-owner-tenant")).status, 404);
+  assert.equal((await call("scope-owner", "teacher-owner-tenant")).status, 404);
+  const restored = await ownerCall({ revision: changed.headers.get("ETag"), policy: { role: "teacher", active: true } });
+  assert.equal(restored.status, 200);
+  assert.equal((await call("scope-owner", "student-owner-tenant")).status, 200);
+
+  const audit = await admin.query(`
+    SELECT owner_subject, actor_id, old_role, old_active, new_role, new_active
+    FROM ei_scope.membership_audit WHERE tenant_id = 'tenant-owner' AND request_id = $1`, [result.requestId]);
+  assert.deepEqual(audit.rows, [{ owner_subject: "verified-owner", actor_id: "teacher",
+    old_role: "teacher", old_active: true, new_role: "teacher", new_active: false }]);
+  assert.equal((await ownerCall({ tenant: "tenant-other" })).status, 200);
+  assert.equal((await call("scope-delivery", "teacher-other")).status, 200);
+  await assert.rejects(ownerPool.query("SELECT * FROM ei_scope.directive"), { code: "42501" });
+  await assert.rejects(ownerPool.query("DELETE FROM ei_scope.membership_audit"), { code: "42501" });
+});
+
+test("owner policy update rolls back when the audit insert fails", async () => {
+  const current = await ownerCall({ actorId: "student" });
+  const revision = current.headers.get("ETag");
+  const failed = await ownerCall({ actorId: "student", revision, policy: { role: "student", active: false } });
+  assert.equal(failed.status, 503);
+  assert.equal((await failed.json()).code, "OWNER_CONTROL_UNAVAILABLE");
+  const after = await ownerCall({ actorId: "student" });
+  assert.equal(after.headers.get("ETag"), revision);
+  assert.equal((await after.json()).membership.active, true);
 });
