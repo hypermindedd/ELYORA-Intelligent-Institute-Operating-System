@@ -3,7 +3,7 @@
   "info": {
     "title": "EI-OS Product Owner API",
     "version": "1.0.0-draft",
-    "description": "Control plane for existing memberships. Authenticated owner with fresh step-up. All responses are no-store."
+    "description": "Control plane for existing memberships and assignment revocation. Authenticated owner with fresh step-up. All responses are no-store."
   },
   "security": [
     {
@@ -112,6 +112,138 @@
           },
           "415": {
             "$ref": "#/components/responses/Status415"
+          },
+          "428": {
+            "$ref": "#/components/responses/Status428"
+          }
+        }
+      }
+    },
+    "/api/v1/owner/tenants/{tenantId}/assignments/{teacherId}/{studentId}": {
+      "parameters": [
+        {
+          "name": "tenantId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "teacherId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "studentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readOwnerAssignment",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Assignment"
+          },
+          "400": {
+            "$ref": "#/components/responses/Status400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Status401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Status403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Status404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Status405"
+          },
+          "503": {
+            "$ref": "#/components/responses/Status503"
+          }
+        }
+      }
+    },
+    "/api/v1/owner/tenants/{tenantId}/assignments/{teacherId}/{studentId}/revocation": {
+      "parameters": [
+        {
+          "name": "tenantId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "teacherId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "studentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "revokeOwnerAssignment",
+        "description": "Revoke an existing assignment. An exact revision is required. No request body. A current already-revoked assignment returns the same projection without appending another audit record.",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[A-Za-z0-9_-]{1,128}\"$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Assignment"
+          },
+          "400": {
+            "$ref": "#/components/responses/Status400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Status401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Status403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Status404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Status405"
+          },
+          "503": {
+            "$ref": "#/components/responses/Status503"
+          },
+          "412": {
+            "$ref": "#/components/responses/Status412"
           },
           "428": {
             "$ref": "#/components/responses/Status428"
@@ -288,7 +420,11 @@
           "Allow": {
             "schema": {
               "type": "string",
-              "const": "GET, PUT"
+              "enum": [
+                "GET, PUT",
+                "GET",
+                "POST"
+              ]
             }
           }
         },
@@ -318,7 +454,7 @@
         }
       },
       "Status412": {
-        "description": "MEMBERSHIP_CHANGED",
+        "description": "MEMBERSHIP_CHANGED | ASSIGNMENT_CHANGED",
         "headers": {
           "X-Request-Id": {
             "schema": {
@@ -340,7 +476,8 @@
                 "code": {
                   "type": "string",
                   "enum": [
-                    "MEMBERSHIP_CHANGED"
+                    "MEMBERSHIP_CHANGED",
+                    "ASSIGNMENT_CHANGED"
                   ]
                 },
                 "requestId": {
@@ -515,6 +652,30 @@
             }
           }
         }
+      },
+      "Assignment": {
+        "description": "Authorized assignment status",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "ETag": {
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[A-Za-z0-9_-]{1,128}\"$"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AssignmentResponse"
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -575,6 +736,51 @@
               },
               "active": {
                 "type": "boolean"
+              }
+            }
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AssignmentResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assignment",
+          "requestId"
+        ],
+        "properties": {
+          "assignment": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tenantId",
+              "teacherId",
+              "studentId",
+              "status"
+            ],
+            "properties": {
+              "tenantId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "teacherId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "studentId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "revoked"
+                ]
               }
             }
           },

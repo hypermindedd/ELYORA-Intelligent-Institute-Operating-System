@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 
 const membershipPath = /^\/api\/v1\/owner\/tenants\/([A-Za-z0-9_-]{1,128})\/memberships\/([A-Za-z0-9_-]{1,128})$/;
+const assignmentPath = /^\/api\/v1\/owner\/tenants\/([A-Za-z0-9_-]{1,128})\/assignments\/([A-Za-z0-9_-]{1,128})\/([A-Za-z0-9_-]{1,128})(?:\/(revocation))?$/;
+const assignmentTag = /^"([A-Za-z0-9_-]{1,128})"$/;
 const revisionPattern = /^"([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})"$/;
 const roles = new Set(["teacher", "student", "institute_manager"]);
 
@@ -35,7 +37,9 @@ async function readPolicy(request) {
   return { status: 400, code: "INVALID_POLICY" };
 }
 
-export function createProductOwnerHandler({ ownerSubject, verifyBearer, readMembership, changeMembership }) {
+export function createProductOwnerHandler({
+  ownerSubject, verifyBearer, readMembership, changeMembership, readAssignment, revokeAssignment
+}) {
   if (typeof ownerSubject !== "string" || !ownerSubject.trim()) throw TypeError("Verified owner subject required");
   return async function handleProductOwner(request) {
     const requestId = randomUUID();
@@ -46,11 +50,12 @@ export function createProductOwnerHandler({ ownerSubject, verifyBearer, readMemb
     const notFound = () => deny(404, "NOT_FOUND");
 
     const { pathname, search } = new URL(request.url);
-    const route = membershipPath.exec(pathname);
-    if (!route) return notFound();
-    const [, tenantId, actorId] = route;
-    if (!["GET", "PUT"].includes(request.method)) return deny(405, "METHOD_NOT_ALLOWED", { Allow: "GET, PUT" });
-    if (search) return deny(400, "INVALID_REQUEST");
+    const memberRoute = membershipPath.exec(pathname);
+    const assignmentRoute = assignmentPath.exec(pathname);
+    if (!memberRoute && !assignmentRoute) return notFound();
+    const methods = memberRoute ? ["GET", "PUT"] : [assignmentRoute[4] ? "POST" : "GET"];
+    if (!methods.includes(request.method)) return deny(405, "METHOD_NOT_ALLOWED", { Allow: methods.join(", ") });
+    if (search || (assignmentRoute && request.body !== null)) return deny(400, "INVALID_REQUEST");
 
     const token = /^Bearer ([A-Za-z0-9._~+\/-]+=*)$/i.exec(request.headers.get("Authorization") ?? "")?.[1];
     if (!token) return deny(401, "UNAUTHENTICATED", { "WWW-Authenticate": "Bearer" });
@@ -60,6 +65,27 @@ export function createProductOwnerHandler({ ownerSubject, verifyBearer, readMemb
       if (identity.subject !== ownerSubject) return notFound();
       if (identity.stepUpVerified !== true) return deny(403, "STEP_UP_REQUIRED");
 
+      if (assignmentRoute) {
+        const [, tenantId, teacherId, studentId, operation] = assignmentRoute;
+        const target = { tenantId, teacherId, studentId };
+        let assignment;
+        if (operation) {
+          const ifMatch = request.headers.get("If-Match");
+          if (ifMatch === null) return deny(428, "REVISION_REQUIRED");
+          const expectedRevision = assignmentTag.exec(ifMatch)?.[1];
+          if (!expectedRevision) return deny(400, "INVALID_REVISION");
+          const result = await revokeAssignment({ ...target, ownerSubject, expectedRevision, requestId });
+          if (result?.changed === false) return deny(412, "ASSIGNMENT_CHANGED");
+          assignment = result?.assignment;
+        } else {
+          assignment = await readAssignment(target);
+        }
+        if (!assignment) return notFound();
+        return reply(200, { assignment: { ...target, status: assignment.status } },
+          { ETag: `"${assignment.revision}"` });
+      }
+
+      const [, tenantId, actorId] = memberRoute;
       let membership;
       if (request.method === "GET") {
         membership = await readMembership({ tenantId, actorId });

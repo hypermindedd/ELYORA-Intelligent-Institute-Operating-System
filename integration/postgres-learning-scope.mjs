@@ -71,7 +71,7 @@ async function seed(tenantId, directiveId) {
 }
 
 before(async () => {
-  for (const migration of ["001_learning_scope.sql", "002_learning_scope_outbox_delivery.sql", "003_product_owner_membership.sql"]) {
+  for (const migration of ["001_learning_scope.sql", "002_learning_scope_outbox_delivery.sql", "003_product_owner_membership.sql", "004_owner_assignment_revocation.sql"]) {
     await admin.query(readFileSync(new URL("../db/migrations/" + migration, import.meta.url), "utf8"));
   }
   await admin.query(`
@@ -98,6 +98,9 @@ before(async () => {
     GRANT SELECT ON ei_scope.membership TO ei_owner_test;
     GRANT UPDATE (role, active, revision) ON ei_scope.membership TO ei_owner_test;
     GRANT INSERT ON ei_scope.membership_audit TO ei_owner_test;
+    GRANT SELECT ON ei_scope.assignment TO ei_owner_test;
+    GRANT UPDATE (status, revision) ON ei_scope.assignment TO ei_owner_test;
+    GRANT INSERT ON ei_scope.assignment_revocation_audit TO ei_owner_test;
 
     INSERT INTO ei_scope.membership (tenant_id, actor_id, role, active) VALUES
       ('tenant-a', 'teacher', 'teacher', true), ('tenant-a', 'student', 'student', true),
@@ -372,4 +375,38 @@ test("owner policy update rolls back when the audit insert fails", async () => {
   const after = await ownerCall({ actorId: "student" });
   assert.equal(after.headers.get("ETag"), revision);
   assert.equal((await after.json()).membership.active, true);
+});
+
+test("permanent assignment revocation is audited once and survives membership restoration", async () => {
+  const target = "https://institute.test/api/v1/owner/tenants/tenant-owner/assignments/teacher/student";
+  const headers = { Authorization: "Bearer owner" };
+  const assignment = await ownerHandler(new Request(target, { headers }));
+  assert.equal(assignment.status, 200);
+  assert.equal((await assignment.json()).assignment.status, "active");
+  const originalRevision = assignment.headers.get("ETag");
+  const revoke = tag => ownerHandler(new Request(target + "/revocation", {
+    method: "POST", headers: { ...headers, "If-Match": tag }
+  }));
+
+  const result = await revoke(originalRevision);
+  assert.equal(result.status, 200);
+  const revokedRevision = result.headers.get("ETag");
+  assert.notEqual(revokedRevision, originalRevision);
+  const response = await result.json();
+  assert.equal(response.assignment.status, "revoked");
+  assert.equal((await revoke(originalRevision)).status, 412);
+  assert.equal((await revoke(revokedRevision)).status, 200);
+  const audit = await admin.query(`
+    SELECT request_id, owner_subject, teacher_id, student_id FROM ei_scope.assignment_revocation_audit
+    WHERE tenant_id = 'tenant-owner'`);
+  assert.deepEqual(audit.rows, [{ request_id: response.requestId, owner_subject: "verified-owner",
+    teacher_id: "teacher", student_id: "student" }]);
+
+  const member = await ownerCall();
+  const off = await ownerCall({ revision: member.headers.get("ETag"), policy: { role: "teacher", active: false } });
+  assert.equal(off.status, 200);
+  assert.equal((await ownerCall({ revision: off.headers.get("ETag"), policy: { role: "teacher", active: true } })).status, 200);
+  assert.equal((await call("scope-owner", "student-owner-tenant")).status, 404);
+  assert.equal((await call("scope-owner", "teacher-owner-tenant")).status, 404);
+  assert.equal((await call("scope-delivery", "teacher-other")).status, 200);
 });
