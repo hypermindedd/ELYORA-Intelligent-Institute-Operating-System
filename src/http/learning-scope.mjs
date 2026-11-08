@@ -1,5 +1,6 @@
 import { readGuidedLearningScope } from "../application/guided-scope.mjs";
-import { approveLanguageScopedDirective, validateLanguageScopedDirective } from "../domain/language-scoped-activity.mjs";
+import { transitionLearningScope } from "../application/learning-scope-transition.mjs";
+import { validateLanguageScopedDirective } from "../domain/language-scoped-activity.mjs";
 import { authorizeTeacherScope } from "../domain/policy.mjs";
 
 const routePattern = /^\/api\/v1\/learning-scopes\/([A-Za-z0-9_-]{1,128})(?:\/(approval|revocation))?$/;
@@ -69,9 +70,8 @@ export function createLearningScopeHandler({ authenticateBearer, loadScope, comm
       if (expected !== revision) return respond(412, "SCOPE_CHANGED");
 
       const at = new Date(now()).toISOString();
-      const next = operation === "approval"
-        ? approveCurrentScope(directive, actor, assignment, at)
-        : revokeCurrentScope(directive, at);
+      const status = operation === "approval" ? "approved" : "revoked";
+      const next = transitionLearningScope({ directive, actor, assignment, status, at });
       if (!next) return respond(409, "INVALID_SCOPE_TRANSITION");
       const committed = await commitScope({
         actorId: actor.actorId, tenantId, directive: next,
@@ -83,15 +83,4 @@ export function createLearningScopeHandler({ authenticateBearer, loadScope, comm
       return respond(503, "SCOPE_UNAVAILABLE");
     }
   };
-}
-
-function approveCurrentScope(directive, actor, assignment, at) {
-  if (directive.revokedAt || Date.parse(at) >= Date.parse(directive.expiresAt)) return null;
-  const approval = approveLanguageScopedDirective({ directive, actor, assignment });
-  return approval.allowed ? approval.directive : null;
-}
-
-function revokeCurrentScope(directive, at) {
-  if (directive.status !== "approved" || directive.approvedBy !== directive.teacherId || directive.revokedAt) return null;
-  return { ...directive, status: "revoked", revokedAt: at };
 }

@@ -22,3 +22,5 @@ Putting auth or persistence in the preview server would mix offline UI assets wi
 Before mounting the handler, verify token signature, audience, expiry and current membership with the official identity integration, implement the transaction and outbox, define durable event payload and privacy routing, verify retry and rollback against the authoritative store, and exercise cross-tenant/direct-link regressions in connected staging. There is no database migration or live endpoint in this increment.
 
 [OpenAPI contract](../../contracts/openapi/learning-scope.v1.json) · [Shared scope policy](ADR-EI-008.md) · [A2](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/issues/3) · [A3](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/issues/4)
+
+[ADR-EI-010](ADR-EI-010.md) provides the transaction-port implementation and the versioned outbox fact.
