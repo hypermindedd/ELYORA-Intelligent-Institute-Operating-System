@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LearningScopeTransitionV1",
+  "description": "Restricted Institute outbox fact; not a browser or realtime payload.",
+  "allOf": [
+    { "$ref": "../schemas/event-envelope.v1.schema.json" },
+    {
+      "properties": {
+        "eventType": { "enum": ["institute.learning_scope.approved", "institute.learning_scope.revoked"] },
+        "classification": { "const": "student_private" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["directiveId", "directiveVersion", "revision"],
+          "properties": {
+            "directiveId": { "type": "string", "minLength": 1 },
+            "directiveVersion": { "type": "integer", "minimum": 2 },
+            "revision": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,128}$" }
+          }
+        }
+      }
+    }
+  ]
+}

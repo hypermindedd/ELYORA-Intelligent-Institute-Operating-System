@@ -1,0 +1,482 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EI-OS Learning Scope",
+    "version": "1.0.0-draft",
+    "description": "Institute-only HTTP contract, verified offline. Unmounted pending authoritative auth, persistence and staging. Responses are not cacheable."
+  },
+  "security": [
+    {
+      "serverBearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/learning-scopes/{directiveId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/DirectiveId"
+        }
+      ],
+      "get": {
+        "operationId": "readLearningScope",
+        "description": "Returns the active student view or assigned teacher lifecycle metadata. Other actors get 404. Teacher responses contain an ETag.",
+        "responses": {
+          "200": {
+            "description": "Authorized view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/StudentScope"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TeacherScope"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[A-Za-z0-9_-]{1,128}\"$"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/learning-scopes/{directiveId}/approval": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/DirectiveId"
+        }
+      ],
+      "post": {
+        "operationId": "approveLearningScope",
+        "description": "Approve an eligible, unexpired proposal. Assigned teacher only. No request body. Read again for the updated revision.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Transition committed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          },
+          "409": {
+            "$ref": "#/components/responses/InvalidTransition"
+          },
+          "412": {
+            "$ref": "#/components/responses/Changed"
+          },
+          "428": {
+            "$ref": "#/components/responses/RevisionRequired"
+          }
+        }
+      }
+    },
+    "/api/v1/learning-scopes/{directiveId}/revocation": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/DirectiveId"
+        }
+      ],
+      "post": {
+        "operationId": "revokeLearningScope",
+        "description": "Revoke an approved directive, including after expiry. Assigned teacher only. No request body. Read again for the updated revision.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Transition committed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          },
+          "409": {
+            "$ref": "#/components/responses/InvalidTransition"
+          },
+          "412": {
+            "$ref": "#/components/responses/Changed"
+          },
+          "428": {
+            "$ref": "#/components/responses/RevisionRequired"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "serverBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "parameters": {
+      "DirectiveId": {
+        "name": "directiveId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,128}$"
+        }
+      },
+      "IfMatch": {
+        "name": "If-Match",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^\"[A-Za-z0-9_-]{1,128}\"$"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "INVALID_REQUEST | INVALID_REVISION",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "INVALID_REQUEST",
+                    "INVALID_REVISION"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "UNAUTHENTICATED",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "UNAUTHENTICATED"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "WWW-Authenticate": {
+            "schema": {
+              "type": "string",
+              "const": "Bearer"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "NOT_FOUND",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "NOT_FOUND"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "MethodNotAllowed": {
+        "description": "METHOD_NOT_ALLOWED",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "METHOD_NOT_ALLOWED"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "Allow": {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "GET",
+                "POST"
+              ]
+            }
+          }
+        }
+      },
+      "InvalidTransition": {
+        "description": "INVALID_SCOPE_TRANSITION",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "INVALID_SCOPE_TRANSITION"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Changed": {
+        "description": "SCOPE_CHANGED",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "SCOPE_CHANGED"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "RevisionRequired": {
+        "description": "REVISION_REQUIRED",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "REVISION_REQUIRED"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unavailable": {
+        "description": "SCOPE_UNAVAILABLE",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "SCOPE_UNAVAILABLE"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "TeacherScope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "directiveId",
+          "status"
+        ],
+        "properties": {
+          "directiveId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "approved",
+              "revoked"
+            ]
+          }
+        }
+      },
+      "StudentScope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "directiveId",
+          "directiveVersion",
+          "programId",
+          "programVersion",
+          "targetLanguageCode",
+          "localeVariant",
+          "instructionLocale",
+          "allowedTopics",
+          "allowedActivityTypes",
+          "maxSessionMinutes",
+          "startsAt",
+          "expiresAt"
+        ],
+        "properties": {
+          "directiveId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "directiveVersion": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "programId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "programVersion": {
+            "type": "string",
+            "minLength": 1
+          },
+          "targetLanguageCode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "localeVariant": {
+            "type": "string",
+            "minLength": 1
+          },
+          "instructionLocale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allowedTopics": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allowedActivityTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "maxSessionMinutes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

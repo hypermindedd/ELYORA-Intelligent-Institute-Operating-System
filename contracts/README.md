@@ -1,2 +1,6 @@
 # EI-OS contract proposals
-All schemas are V1 design drafts, PROPOSED_NON_CANONICAL. They do not authorize direct ELYORA educational state writes. The official ELYORA interface requires separate source owner verification. Schema-file parse and required/unique checks performed by scripts/validate-contracts.mjs are **structural lint**, not a complete JSON Schema conformance test. Full validation library, API/OpenAPI, contract negotiation, idempotency and event consumers belong to phase A2/A3.
+
+Institute contracts are drafts and cannot authorize writes to ELYORA educational state. The official ELYORA interface requires separate source-owner verification.
+
+- [Learning Scope API v1](openapi/learning-scope.v1.json) covers reading, approving and revoking an existing directive. The [HTTP handler](../src/http/learning-scope.mjs) uses server-supplied identity and persistence ports. [ADR-EI-009](../docs/adr/ADR-EI-009.md) describes the transaction, retry, privacy and staging gates.
+- [Schema inventory](schemas/) includes versioned Institute drafts. The repository check runs structural lint and targeted request/response tests. Full JSON Schema conformance, event payload validation and connected integration remain A2/A3 work.
