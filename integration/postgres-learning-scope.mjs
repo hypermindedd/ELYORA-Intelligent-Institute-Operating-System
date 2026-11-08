@@ -108,7 +108,8 @@ before(async () => {
       ('tenant-b', 'teacher', 'teacher', true), ('tenant-b', 'student', 'student', true),
       ('tenant-work', 'teacher', 'teacher', true), ('tenant-work', 'student', 'student', true),
       ('tenant-other', 'teacher', 'teacher', true), ('tenant-other', 'student', 'student', true),
-      ('tenant-owner', 'teacher', 'teacher', true), ('tenant-owner', 'student', 'student', true);
+      ('tenant-owner', 'teacher', 'teacher', true), ('tenant-owner', 'student', 'student', true),
+      ('tenant-owner', 'teacher-new', 'teacher', true), ('tenant-owner', 'teacher-fail', 'teacher', true);
     INSERT INTO ei_scope.assignment VALUES
       ('tenant-a', 'teacher', 'student', 'a0', 'active'),
       ('tenant-b', 'teacher', 'student', 'b0', 'active'),
@@ -147,6 +148,23 @@ before(async () => {
   }
   await seed("tenant-other", "scope-delivery");
   await seed("tenant-owner", "scope-owner");
+  await admin.query(readFileSync(new URL("../db/migrations/005_owner_assignment_grant.sql", import.meta.url), "utf8"));
+  await admin.query(`
+    GRANT INSERT (tenant_id, teacher_id, student_id, revision, status) ON ei_scope.assignment TO ei_owner_test;
+    GRANT UPDATE (generation) ON ei_scope.assignment TO ei_owner_test;
+    GRANT INSERT ON ei_scope.assignment_grant_audit TO ei_owner_test;
+
+    CREATE FUNCTION ei_scope.reject_fixture_grant_audit() RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN
+      IF NEW.teacher_id = 'teacher-fail' THEN
+        RAISE EXCEPTION 'injected grant audit failure';
+      END IF;
+      RETURN NEW;
+    END;
+    $$;
+    CREATE TRIGGER reject_fixture_grant_audit BEFORE INSERT ON ei_scope.assignment_grant_audit
+    FOR EACH ROW EXECUTE FUNCTION ei_scope.reject_fixture_grant_audit();
+  `);
 });
 
 after(async () => { await Promise.all([admin.end(), pool.end(), workerPool.end(), sinkPool.end(), ownerPool.end()]); });
@@ -409,4 +427,61 @@ test("permanent assignment revocation is audited once and survives membership re
   assert.equal((await call("scope-owner", "student-owner-tenant")).status, 404);
   assert.equal((await call("scope-owner", "teacher-owner-tenant")).status, 404);
   assert.equal((await call("scope-delivery", "teacher-other")).status, 200);
+});
+
+function assignmentCall(teacherId, { tenant = "tenant-owner", token = "owner", action, ifMatch, createOnly } = {}) {
+  const target = `https://institute.test/api/v1/owner/tenants/${tenant}/assignments/${teacherId}/student`;
+  const headers = { Authorization: "Bearer " + token };
+  if (ifMatch) headers["If-Match"] = ifMatch;
+  if (createOnly) headers["If-None-Match"] = "*";
+  return ownerHandler(new Request(target + (action ? "/" + action : ""), {
+    method: action ? "POST" : "GET", headers,
+  }));
+}
+
+test("grant is conditional and atomic, and rejects invalid participants", async () => {
+  const action = "grant";
+  const createOnly = true;
+  assert.equal((await assignmentCall("teacher-new", { action })).status, 428);
+  assert.equal((await assignmentCall("teacher-new", { action, createOnly, token: "manager" })).status, 404);
+  assert.equal((await assignmentCall("teacher-new", { tenant: "tenant-other", action, createOnly })).status, 409);
+  assert.equal((await assignmentCall("student", { action, createOnly })).status, 409);
+
+  const attempts = await Promise.all([
+    assignmentCall("teacher-new", { action, createOnly }),
+    assignmentCall("teacher-new", { action, createOnly }),
+  ]);
+  assert.deepEqual(attempts.map(r => r.status).sort(), [200, 412]);
+  const granted = attempts.find(r => r.status === 200);
+  assert.equal((await granted.json()).assignment.status, "active");
+  assert.equal((await assignmentCall("teacher-new")).headers.get("ETag"), granted.headers.get("ETag"));
+  assert.equal((await admin.query(
+    "SELECT 1 FROM ei_scope.assignment_grant_audit WHERE tenant_id = 'tenant-owner' AND teacher_id = 'teacher-new'"
+  )).rowCount, 1);
+
+  assert.equal((await assignmentCall("teacher-fail", { action, createOnly })).status, 503);
+  assert.equal((await assignmentCall("teacher-fail")).status, 404);
+});
+
+test("re-grant keeps earlier scopes closed and authorizes a new directive", async () => {
+  const current = await assignmentCall("teacher");
+  const currentRevision = current.headers.get("ETag");
+  assert.equal((await current.json()).assignment.status, "revoked");
+  assert.equal((await assignmentCall("teacher", { action: "grant", createOnly: true })).status, 412);
+  const granted = await assignmentCall("teacher", { action: "grant", ifMatch: currentRevision });
+  assert.equal(granted.status, 200);
+  assert.notEqual(granted.headers.get("ETag"), currentRevision);
+
+  assert.equal((await call("scope-owner", "student-owner-tenant")).status, 404);
+  assert.equal((await call("scope-owner", "teacher-owner-tenant")).status, 404);
+
+  await seed("tenant-owner", "scope-after-regrant");
+  assert.equal((await call("scope-after-regrant", "teacher-owner-tenant", "approval", '"r0"')).status, 204);
+  assert.equal((await call("scope-after-regrant", "student-owner-tenant")).status, 200);
+
+  const { rows } = await admin.query(`
+    SELECT directive_id, assignment_generation FROM ei_scope.directive
+    WHERE tenant_id = 'tenant-owner' ORDER BY directive_id`);
+  assert.equal(rows.length, 2);
+  assert.notEqual(rows[0].assignment_generation, rows[1].assignment_generation);
 });

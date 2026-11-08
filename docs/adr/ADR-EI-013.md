@@ -1,6 +1,6 @@
 # ADR-EI-013 — Product owner control plane and response routing
 
-**Status** Proposed for connected use. Membership administration and assignment revocation are executable slices.  
+**Status** Proposed for connected use. Membership administration and the grant/revoke assignment lifecycle are executable slices.  
 **Authority** Master Project Instruction §§7–10, 14–16, 35 and 45.
 
 ## Authority model
@@ -10,12 +10,16 @@ The product owner has a dedicated control plane across Institute tenants. Authen
 | Control area | Owner capability and boundary | State |
 | --- | --- | --- |
 | Institute membership | Inspect role and active status for an existing member. Change the role or suspend and restore access for a selected tenant. | Implemented in this branch |
-| Institute assignments | Inspect and revoke an existing teacher-to-student assignment in the selected tenant. Restoration requires an explicit future grant flow with new authority. | Implemented in this branch |
+| Institute assignments | Inspect, grant and revoke a teacher-to-student assignment in the selected tenant. A re-grant begins a new authority generation. | Implemented in this branch |
 | Institute policies and operations | Govern tenant provisioning, role policies, rooms, schedules, integrations and feature entitlements through their owning commands. Separate reversible settings from destructive or high-impact operations. | Planned, each command has its own contract |
 | Privacy and learning | Govern which approved policy and contracts apply. Protected teacher/student records remain in their owners' authorized views. ELYORA Core alone writes educational state and teacher authorization remains the authority for learning scope. | Inherited boundary |
 | Owner recovery | Recover or rotate the trusted binding through an administrative configuration process. A membership command cannot delegate or change product ownership. | Deployment gate |
 
-Suspension and a change away from the required role remove the member's operational authority on the next scope request. An inactive author or student also makes their existing scope unavailable. Reactivation restores only otherwise eligible assignments and directives that remain current. Permanent assignment revocation has a dedicated lifecycle command. It increments the assignment revision and appends one audit entry atomically. The existing scope read and commit paths deny against the revoked assignment, including after membership restoration. The command emits no new educational fact and changes no directive document. Directive revocation retains its own lifecycle command. This preserves the distinction between suspending an account and revoking an educational directive.
+Suspension and a change away from the required role remove the member's operational authority on the next scope request. An inactive author or student also makes their existing scope unavailable. Reactivation restores only otherwise eligible assignments and directives that remain current. Permanent assignment revocation has a dedicated lifecycle command. It increments the assignment revision and appends one audit entry atomically. The existing scope read and commit paths deny against the revoked assignment, including after membership restoration. The command emits no new educational fact and changes no directive document. Directive revocation retains its own lifecycle command.
+
+A new grant requires `If-None-Match: *`. Re-grant requires the current assignment ETag. Verify both participants' active, role-correct membership in the same tenant. Re-grant creates a new generation UUID. A directive records the generation current when it was created, and every scope read or commit checks the binding. The migration backfills existing directives and uses a database trigger to bind future inserts. Earlier directives are retained for evidence and stay unavailable after a re-grant. The grant and its audit entry commit atomically.
+
+Apply the generation migration under the controlled schema owner. It locks and backfills existing rows, then restores forced row security before commit. For rollout measure lock and backfill duration on representative data. Preserve the migration when rolling back the UI or owner route. Reverting to a scope reader that ignores the generation can re-expose old scopes, so keep the new reader deployed or stop scope traffic before a rollback. This preserves the distinction between suspending an account and revoking an educational directive.
 
 ## Request and response routing
 

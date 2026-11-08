@@ -21,6 +21,41 @@ export function createPostgresProductOwnerHandler({ pool, ownerSubject, verifyBe
         const result = await client.query(assignmentQuery, [tenantId, teacherId, studentId]);
         return result.rows[0] ?? null;
       }),
+    grantAssignment: ({ tenantId, teacherId, studentId, ownerSubject, expectedRevision, requestId }) =>
+      inPostgresTenant(pool, tenantId, "BEGIN", async client => {
+        const keys = [tenantId, teacherId, studentId];
+        const participants = await client.query(`
+          SELECT actor_id, role FROM ei_scope.membership
+          WHERE tenant_id = $1 AND active AND
+            ((actor_id = $2 AND role = 'teacher') OR (actor_id = $3 AND role = 'student'))
+          ORDER BY actor_id FOR SHARE`, keys);
+        if (participants.rowCount !== 2) return { participantsUnavailable: true };
+
+        const result = await client.query(assignmentQuery + " FOR UPDATE", keys);
+        const current = result.rows[0] ?? null;
+        if ((current?.revision ?? null) !== expectedRevision) return { changed: false };
+        if (current?.status === "active") return { assignment: current };
+
+        const update = current
+          ? await client.query(`
+              UPDATE ei_scope.assignment
+              SET status = 'active', revision = gen_random_uuid()::text, generation = gen_random_uuid()
+              WHERE tenant_id = $1 AND teacher_id = $2 AND student_id = $3
+              RETURNING status, revision, generation`, keys)
+          : await client.query(`
+              INSERT INTO ei_scope.assignment (tenant_id, teacher_id, student_id, revision, status)
+              VALUES ($1, $2, $3, gen_random_uuid()::text, 'active')
+              ON CONFLICT DO NOTHING RETURNING status, revision, generation`, keys);
+        const assignment = update.rows[0];
+        if (!assignment) return { changed: false };
+
+        await client.query(`
+          INSERT INTO ei_scope.assignment_grant_audit
+            (tenant_id, teacher_id, student_id, request_id, owner_subject, previous_revision, granted_revision, granted_generation)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [...keys, requestId, ownerSubject, expectedRevision, assignment.revision, assignment.generation]);
+        return { assignment };
+      }),
     revokeAssignment: ({ tenantId, teacherId, studentId, ownerSubject, expectedRevision, requestId }) =>
       inPostgresTenant(pool, tenantId, "BEGIN", async client => {
         const keys = [tenantId, teacherId, studentId];

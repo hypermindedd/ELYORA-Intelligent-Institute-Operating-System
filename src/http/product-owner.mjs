@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 const membershipPath = /^\/api\/v1\/owner\/tenants\/([A-Za-z0-9_-]{1,128})\/memberships\/([A-Za-z0-9_-]{1,128})$/;
-const assignmentPath = /^\/api\/v1\/owner\/tenants\/([A-Za-z0-9_-]{1,128})\/assignments\/([A-Za-z0-9_-]{1,128})\/([A-Za-z0-9_-]{1,128})(?:\/(revocation))?$/;
+const assignmentPath = /^\/api\/v1\/owner\/tenants\/([A-Za-z0-9_-]{1,128})\/assignments\/([A-Za-z0-9_-]{1,128})\/([A-Za-z0-9_-]{1,128})(?:\/(revocation|grant))?$/;
 const assignmentTag = /^"([A-Za-z0-9_-]{1,128})"$/;
 const revisionPattern = /^"([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})"$/;
 const roles = new Set(["teacher", "student", "institute_manager"]);
@@ -38,7 +38,7 @@ async function readPolicy(request) {
 }
 
 export function createProductOwnerHandler({
-  ownerSubject, verifyBearer, readMembership, changeMembership, readAssignment, revokeAssignment
+  ownerSubject, verifyBearer, readMembership, changeMembership, readAssignment, revokeAssignment, grantAssignment
 }) {
   if (typeof ownerSubject !== "string" || !ownerSubject.trim()) throw TypeError("Verified owner subject required");
   return async function handleProductOwner(request) {
@@ -71,11 +71,17 @@ export function createProductOwnerHandler({
         let assignment;
         if (operation) {
           const ifMatch = request.headers.get("If-Match");
-          if (ifMatch === null) return deny(428, "REVISION_REQUIRED");
-          const expectedRevision = assignmentTag.exec(ifMatch)?.[1];
-          if (!expectedRevision) return deny(400, "INVALID_REVISION");
-          const result = await revokeAssignment({ ...target, ownerSubject, expectedRevision, requestId });
+          const ifNoneMatch = request.headers.get("If-None-Match");
+          const createOnly = operation === "grant" && ifNoneMatch === "*";
+          if (ifNoneMatch !== null && (!createOnly || ifMatch !== null)) return deny(400, "INVALID_REVISION");
+          if (ifMatch === null && !createOnly) return deny(428, "REVISION_REQUIRED");
+          const expectedRevision = ifMatch === null ? null : assignmentTag.exec(ifMatch)?.[1];
+          if (ifMatch !== null && !expectedRevision) return deny(400, "INVALID_REVISION");
+
+          const command = { ...target, ownerSubject, expectedRevision, requestId };
+          const result = operation === "grant" ? await grantAssignment(command) : await revokeAssignment(command);
           if (result?.changed === false) return deny(412, "ASSIGNMENT_CHANGED");
+          if (result?.participantsUnavailable) return deny(409, "ASSIGNMENT_PARTICIPANTS_UNAVAILABLE");
           assignment = result?.assignment;
         } else {
           assignment = await readAssignment(target);

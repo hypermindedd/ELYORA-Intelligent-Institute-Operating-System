@@ -16,7 +16,7 @@ const scopeQuery = `
     AND teacher.active AND teacher.role = 'teacher'
   JOIN ei_scope.membership student ON student.tenant_id = d.tenant_id AND student.actor_id = d.student_id
     AND student.active AND student.role = 'student'
-  WHERE d.tenant_id = $1 AND d.directive_id = $2`;
+  WHERE d.tenant_id = $1 AND d.directive_id = $2 AND d.assignment_generation = a.generation`;
 
 async function first(client, sql, params) {
   const result = await client.query(sql, params);

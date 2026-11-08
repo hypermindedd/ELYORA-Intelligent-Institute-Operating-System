@@ -3,7 +3,7 @@
   "info": {
     "title": "EI-OS Product Owner API",
     "version": "1.0.0-draft",
-    "description": "Control plane for existing memberships and assignment revocation. Authenticated owner with fresh step-up. All responses are no-store."
+    "description": "Control plane for existing memberships and assignment grants and revocation. Authenticated owner with fresh step-up. All responses are no-store."
   },
   "security": [
     {
@@ -247,6 +247,91 @@
           },
           "428": {
             "$ref": "#/components/responses/Status428"
+          }
+        }
+      }
+    },
+    "/api/v1/owner/tenants/{tenantId}/assignments/{teacherId}/{studentId}/grant": {
+      "parameters": [
+        {
+          "name": "tenantId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "teacherId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "studentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "grantOwnerAssignment",
+        "description": "Grant a new assignment with If-None-Match: *, or re-grant a revoked assignment with its current If-Match. Exactly one precondition is required. No body. Re-grant uses a new generation and does not restore old scope.",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[A-Za-z0-9_-]{1,128}\"$"
+            }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "const": "*"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Assignment"
+          },
+          "400": {
+            "$ref": "#/components/responses/Status400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Status401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Status403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Status404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Status405"
+          },
+          "503": {
+            "$ref": "#/components/responses/Status503"
+          },
+          "412": {
+            "$ref": "#/components/responses/Status412"
+          },
+          "428": {
+            "$ref": "#/components/responses/Status428"
+          },
+          "409": {
+            "$ref": "#/components/responses/Status409"
           }
         }
       }
@@ -673,6 +758,39 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/AssignmentResponse"
+            }
+          }
+        }
+      },
+      "Status409": {
+        "description": "Active teacher and student memberships in this tenant are required.",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "const": "ASSIGNMENT_PARTICIPANTS_UNAVAILABLE"
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
             }
           }
         }
