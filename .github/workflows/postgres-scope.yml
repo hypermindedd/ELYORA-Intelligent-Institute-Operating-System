@@ -1,0 +1,42 @@
+name: EI-OS PostgreSQL scope integration
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/postgres-scope.yml'
+      - 'db/migrations/**'
+      - 'integration/postgres-learning-scope.mjs'
+      - 'src/adapters/**'
+      - 'src/application/**'
+      - 'src/domain/**'
+      - 'src/http/**'
+permissions:
+  contents: read
+jobs:
+  postgres-scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ei_scope_test
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ei_scope_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      EI_SCOPE_TEST_DATABASE: postgres://postgres:postgres@127.0.0.1:5432/ei_scope_test
+      EI_SCOPE_TEST_APP_DATABASE: postgres://ei_scope_test:ei_scope_test@127.0.0.1:5432/ei_scope_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install the test-only PostgreSQL driver
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund pg@8.16.3
+      - name: Verify isolated PostgreSQL authorization and atomic writes
+        run: node --test integration/postgres-learning-scope.mjs

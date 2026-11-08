@@ -39,7 +39,7 @@ export function createLearningScopeHandler({ authenticateBearer, loadScope, comm
       }
 
       const tenantId = actor.tenantId;
-      const snapshot = await loadScope({ tenantId, directiveId });
+      const snapshot = await loadScope({ tenantId, directiveId, actorId: actor.actorId, role: actor.role });
       const directive = snapshot?.directive;
       if (directive?.tenantId !== tenantId || directive.directiveId !== directiveId) {
         return respond(404, "NOT_FOUND");

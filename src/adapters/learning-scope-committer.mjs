@@ -32,6 +32,6 @@ export function createLearningScopeCommitter({ transact, now = Date.now }) {
         payload: { directiveId: next.directiveId, directiveVersion: next.version, revision }
       });
       return true;
-    });
+    }, { tenantId });
   };
 }
