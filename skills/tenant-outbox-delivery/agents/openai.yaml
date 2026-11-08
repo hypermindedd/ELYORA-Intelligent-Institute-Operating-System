@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tenant Outbox Delivery"
+  short_description: "Build reliable tenant-scoped event delivery"
+  default_prompt: "Use $tenant-outbox-delivery to build and verify a tenant-scoped transactional outbox."
