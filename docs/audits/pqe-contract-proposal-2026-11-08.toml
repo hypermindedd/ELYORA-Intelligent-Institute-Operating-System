@@ -1,0 +1,173 @@
+# PROPOSAL ONLY — inactive until owner approval. Not read by any workflow at this path.
+# Source: WARDEN audit 2026-11-08 (docs/audits/WARDEN_TRACE_AUDIT_2026-11-08_FA.md).
+# To adopt: review goals and hard gates, then copy to .qa/pqe.toml.
+# The postgres.integration command needs a PostgreSQL 16 service and the two
+# EI_SCOPE_TEST_* variables (see .github/workflows/postgres-scope.yml); the test-only
+# driver is installed with: npm install --no-save --package-lock=false --ignore-scripts pg@8.16.3
+# Verified run on stack top be5caef (PR #20): 4/5 goals MET; G-04 NOT_MET (2 accessibility issues).
+[project]
+name = "EI-OS"
+goal = "Multi-tenant virtual institute: teacher-governed learning scope, private cabins, Institute command; ELYORA owns learning truth."
+docs = ["README.md", "AGENTS.md", "docs/**/*.md"]
+exclude = ["node_modules/**"]
+
+[pytest]
+enabled = false
+
+[architecture]
+python_roots = []
+detect_cycles = true
+
+[security]
+secrets = true
+bandit = false
+pip_audit = false
+pip_audit_requirements = []
+npm_audit_dirs = ["."]
+
+[[commands]]
+id = "node.check"
+title = "Contract lint, engine registry DAG and Node unit tests"
+argv = ["npm", "run", "check"]
+dimension = "FUNCTIONAL"
+timeout_s = 300
+
+[[commands]]
+id = "node.demo"
+title = "Offline vertical slice (ELYORA must stay BLOCKED)"
+argv = ["npm", "run", "demo"]
+dimension = "FUNCTIONAL"
+timeout_s = 120
+
+[[commands]]
+id = "postgres.integration"
+title = "Real PostgreSQL 16: RLS, atomic outbox, leasing, owner audit"
+argv = ["node", "--test", "integration/postgres-learning-scope.mjs"]
+dimension = "SECURITY_RUNTIME"
+timeout_s = 300
+env = { EI_SCOPE_TEST_DATABASE = "postgres://postgres:postgres@127.0.0.1:5432/ei_scope_test", EI_SCOPE_TEST_APP_DATABASE = "postgres://ei_scope_test:ei_scope_test@127.0.0.1:5432/ei_scope_test" }
+
+[[commands]]
+id = "campus.build"
+title = "Static campus build"
+argv = ["npm", "run", "build:campus"]
+dimension = "BUILD"
+timeout_s = 120
+
+[api]
+enabled = true
+start_command = ["node", "apps/web/server.mjs"]
+env = { PORT = "${PQE_PORT}" }
+health_path = "/api/health"
+require_security_headers = true
+fuzz_paths = true
+fuzz_bodies = true
+
+[[api.endpoints]]
+method = "GET"
+path = "/api/health"
+auth = false
+expect = [200]
+load_safe = true
+
+[[api.endpoints]]
+method = "GET"
+path = "/api/demo/languages"
+auth = false
+expect = [200]
+load_safe = true
+
+[[api.endpoints]]
+method = "POST"
+path = "/api/health"
+auth = false
+expect = [405]
+
+[[api.endpoints]]
+method = "GET"
+path = "/../package.json"
+auth = false
+expect = [404]
+
+[[api.endpoints]]
+method = "GET"
+path = "/apps/web/server.mjs"
+auth = false
+expect = [404]
+
+[ui]
+enabled = true
+start_command = ["node", "apps/web/server.mjs"]
+env = { PORT = "${PQE_PORT}" }
+ready_path = "/"
+pages = ["/"]
+expect_dir = "rtl"
+max_clicks_per_page = 40
+
+[[ui.journeys]]
+id = "J-01"
+title = "Visitor walks all four spaces and every live action is honestly blocked"
+steps = [
+  { action = "goto", value = "/" },
+  { action = "click", selector = "[data-view=student]" },
+  { action = "click", selector = "[data-view=teacher]" },
+  { action = "click", selector = "[data-view=classroom]" },
+  { action = "click", selector = "[data-view=command]" },
+  { action = "expect_visible", selector = "#main" },
+]
+
+[[ui.journeys]]
+id = "J-02"
+title = "Interface switches to English (LTR) and back to Persian (RTL)"
+steps = [
+  { action = "goto", value = "/" },
+  { action = "select", selector = "#ui-locale", value = "en-US" },
+  { action = "wait_ms", value = "400" },
+  { action = "select", selector = "#ui-locale", value = "fa-IR" },
+  { action = "wait_ms", value = "400" },
+  { action = "expect_visible", selector = "#space-navigation" },
+]
+
+[web]
+enabled = true
+links = true
+seo = true
+lighthouse = true
+
+[[goals]]
+id = "U-01"
+title = "No secrets are committed"
+source = "engine universal bar"
+hard_gate = true
+criteria = [{ kind = "check", check = "security.secrets" }]
+
+[[goals]]
+id = "G-01"
+title = "Offline domain kernel and contracts pass"
+source = "README / BUILD_PLAN A2"
+hard_gate = true
+criteria = [{ kind = "check", check = "command.node.check" }]
+
+[[goals]]
+id = "G-02"
+title = "Tenant isolation and atomic outbox hold on a real database"
+source = "AGENTS.md negative security cases; NEXT_BUILD_A2 exit gates"
+hard_gate = true
+criteria = [{ kind = "check", check = "command.postgres.integration" }]
+
+[[goals]]
+id = "G-03"
+title = "Preview server is fail-closed and hardened"
+source = "README preview; REFERENCE_ARCHITECTURE"
+hard_gate = true
+criteria = [{ kind = "check", check = "api.contract" }, { kind = "check", check = "api.security.headers" }, { kind = "check", check = "api.robustness" }]
+
+[[goals]]
+id = "G-04"
+title = "Campus is usable and accessible in RTL and LTR"
+source = "VISUAL_REFERENCE_LOCK; EIGHT_LANGUAGE_FOUNDATION"
+hard_gate = false
+criteria = [{ kind = "check", check = "ui.*" }]
+
+[report]
+language = "fa"
