@@ -1,6 +1,6 @@
 import { invokeElyoraPractice } from "../adapters/elyora-port.mjs";
 import { evaluateLanguageScopedPractice } from "../domain/language-scoped-activity.mjs";
-import { authorizeActiveAssignment } from "../domain/policy.mjs";
+import { verifyCurrentScopeAssignment } from "./guided-scope.mjs";
 
 /**
  * Internal, offline composition. A future server must resolve actor, current
@@ -9,16 +9,7 @@ import { authorizeActiveAssignment } from "../domain/policy.mjs";
 export async function startGuidedPractice({ actor, directive, assignment, activity, at }) {
   const scope = evaluateLanguageScopedPractice({ actor, directive, activity, at });
   if (!scope.allowed) return scope;
-  if (directive.approvedBy !== directive.teacherId) {
-    return { allowed: false, reason: "APPROVER_MISMATCH" };
-  }
-
-  const currentAssignment = authorizeActiveAssignment({
-    assignment,
-    tenantId: directive.tenantId,
-    teacherId: directive.teacherId,
-    studentId: directive.studentId
-  });
+  const currentAssignment = verifyCurrentScopeAssignment(directive, assignment);
   if (!currentAssignment.allowed) return currentAssignment;
 
   const request = Object.freeze({

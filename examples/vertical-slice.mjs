@@ -3,6 +3,7 @@
  */
 import { approveLanguageScopedDirective } from "../src/domain/language-scoped-activity.mjs";
 import { startGuidedPractice } from "../src/application/guided-practice.mjs";
+import { readGuidedLearningScope } from "../src/application/guided-scope.mjs";
 import { evaluateRoomEligibility } from "../src/domain/rooms.mjs";
 
 const now = "2026-11-07T12:30:00.000Z";
@@ -19,6 +20,10 @@ const directive = {
 };
 const approval = approveLanguageScopedDirective({ directive, actor: teacher, assignment });
 if (!approval.allowed) throw Error("Offline approval expectation failed");
+const view = readGuidedLearningScope({ directive: approval.directive, actor: student, assignment, at: now });
+if (!view.allowed || !view.data.allowedTopics.includes("greetings")) {
+  throw Error("Offline student-view expectation failed");
+}
 const access = await startGuidedPractice({
   directive: approval.directive, actor: student, assignment,
   activity: { programId: "english-a1", programVersion: "demo-english-a1", targetLanguageCode: "en",
@@ -36,7 +41,7 @@ if (!roomEligibility.allowed) throw Error("Offline room-eligibility expectation 
 if (access.integration !== "BLOCKED_NOT_CONNECTED") throw Error("ELYORA must fail closed without a verified contract");
 console.log(JSON.stringify({
   mode: "OFFLINE_SIMULATION_NOT_PRODUCTION",
-  directive: approval.directive.status, scopeDecision: access.reason,
+  directive: approval.directive.status, studentScopeReadable: view.allowed, scopeDecision: access.reason,
   roomDecision: roomEligibility.reason,
   elyoraIntegration: access.integration, liveEducation: "NOT_TESTED"
 }, null, 2));
