@@ -1,5 +1,6 @@
 import { createLearningScopeHandler } from "../http/learning-scope.mjs";
 import { createLearningScopeCommitter } from "./learning-scope-committer.mjs";
+import { inPostgresTenant } from "./postgres-tenant.mjs";
 
 const actorQuery = `
   SELECT actor_id AS "actorId", tenant_id AS "tenantId", role, true AS "serverAuthenticated"
@@ -13,27 +14,6 @@ const scopeQuery = `
   JOIN ei_scope.assignment a USING (tenant_id, teacher_id, student_id)
   WHERE d.tenant_id = $1 AND d.directive_id = $2`;
 
-async function inTenant(pool, tenantId, begin, work) {
-  const client = await pool.connect();
-  let rollbackError;
-  try {
-    await client.query(begin);
-    await client.query("SELECT set_config('ei_os.tenant_id', $1, true)", [tenantId]);
-    const result = await work(client);
-    await client.query("COMMIT");
-    return result;
-  } catch (error) {
-    try {
-      await client.query("ROLLBACK");
-    } catch (failure) {
-      rollbackError = failure;
-    }
-    throw error;
-  } finally {
-    client.release(rollbackError);
-  }
-}
-
 async function first(client, sql, params) {
   const result = await client.query(sql, params);
   return result.rows[0] ?? null;
@@ -42,11 +22,11 @@ async function first(client, sql, params) {
 export function createPostgresLearningScopeStore(pool) {
   return {
     loadActor({ tenantId, actorId }) {
-      return inTenant(pool, tenantId, "BEGIN READ ONLY", client =>
+      return inPostgresTenant(pool, tenantId, "BEGIN READ ONLY", client =>
         first(client, actorQuery, [tenantId, actorId]));
     },
     loadScope({ tenantId, directiveId, actorId, role }) {
-      return inTenant(pool, tenantId, "BEGIN READ ONLY", client => first(client, scopeQuery + `
+      return inPostgresTenant(pool, tenantId, "BEGIN READ ONLY", client => first(client, scopeQuery + `
         AND EXISTS (
           SELECT 1 FROM ei_scope.membership m
           WHERE m.tenant_id = d.tenant_id AND m.actor_id = $3 AND m.role = $4 AND m.active
@@ -54,7 +34,7 @@ export function createPostgresLearningScopeStore(pool) {
     },
     async transact(work, { tenantId }) {
       try {
-        return await inTenant(pool, tenantId, "BEGIN ISOLATION LEVEL SERIALIZABLE", client => work({
+        return await inPostgresTenant(pool, tenantId, "BEGIN ISOLATION LEVEL SERIALIZABLE", client => work({
           loadActor: ({ actorId }) => first(client, actorQuery + " FOR SHARE", [tenantId, actorId]),
           loadScope: ({ directiveId }) => first(client, scopeQuery + " FOR UPDATE OF d FOR SHARE OF a",
             [tenantId, directiveId]),
