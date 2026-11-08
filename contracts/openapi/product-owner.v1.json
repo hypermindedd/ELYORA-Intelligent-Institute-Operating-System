@@ -1,0 +1,913 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EI-OS Product Owner API",
+    "version": "1.0.0-draft",
+    "description": "Control plane for existing memberships and assignment grants and revocation. Authenticated owner with fresh step-up. All responses are no-store."
+  },
+  "security": [
+    {
+      "ownerBearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/owner/tenants/{tenantId}/memberships/{actorId}": {
+      "parameters": [
+        {
+          "name": "tenantId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "actorId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readOwnerMembership",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Membership"
+          },
+          "400": {
+            "$ref": "#/components/responses/Status400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Status401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Status403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Status404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Status405"
+          },
+          "503": {
+            "$ref": "#/components/responses/Status503"
+          }
+        }
+      },
+      "put": {
+        "operationId": "changeOwnerMembership",
+        "description": "Replace role and active status for an existing membership. UTF-8 JSON body at most 1024 bytes.",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}\"$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipPolicy"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Membership"
+          },
+          "400": {
+            "$ref": "#/components/responses/Status400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Status401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Status403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Status404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Status405"
+          },
+          "503": {
+            "$ref": "#/components/responses/Status503"
+          },
+          "412": {
+            "$ref": "#/components/responses/Status412"
+          },
+          "413": {
+            "$ref": "#/components/responses/Status413"
+          },
+          "415": {
+            "$ref": "#/components/responses/Status415"
+          },
+          "428": {
+            "$ref": "#/components/responses/Status428"
+          }
+        }
+      }
+    },
+    "/api/v1/owner/tenants/{tenantId}/assignments/{teacherId}/{studentId}": {
+      "parameters": [
+        {
+          "name": "tenantId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "teacherId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "studentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "readOwnerAssignment",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Assignment"
+          },
+          "400": {
+            "$ref": "#/components/responses/Status400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Status401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Status403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Status404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Status405"
+          },
+          "503": {
+            "$ref": "#/components/responses/Status503"
+          }
+        }
+      }
+    },
+    "/api/v1/owner/tenants/{tenantId}/assignments/{teacherId}/{studentId}/revocation": {
+      "parameters": [
+        {
+          "name": "tenantId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "teacherId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "studentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "revokeOwnerAssignment",
+        "description": "Revoke an existing assignment. An exact revision is required. No request body. A current already-revoked assignment returns the same projection without appending another audit record.",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[A-Za-z0-9_-]{1,128}\"$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Assignment"
+          },
+          "400": {
+            "$ref": "#/components/responses/Status400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Status401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Status403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Status404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Status405"
+          },
+          "503": {
+            "$ref": "#/components/responses/Status503"
+          },
+          "412": {
+            "$ref": "#/components/responses/Status412"
+          },
+          "428": {
+            "$ref": "#/components/responses/Status428"
+          }
+        }
+      }
+    },
+    "/api/v1/owner/tenants/{tenantId}/assignments/{teacherId}/{studentId}/grant": {
+      "parameters": [
+        {
+          "name": "tenantId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "teacherId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        },
+        {
+          "name": "studentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "grantOwnerAssignment",
+        "description": "Grant a new assignment with If-None-Match: *, or re-grant a revoked assignment with its current If-Match. Exactly one precondition is required. No body. Re-grant uses a new generation and does not restore old scope.",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[A-Za-z0-9_-]{1,128}\"$"
+            }
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "const": "*"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Assignment"
+          },
+          "400": {
+            "$ref": "#/components/responses/Status400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Status401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Status403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Status404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Status405"
+          },
+          "503": {
+            "$ref": "#/components/responses/Status503"
+          },
+          "412": {
+            "$ref": "#/components/responses/Status412"
+          },
+          "428": {
+            "$ref": "#/components/responses/Status428"
+          },
+          "409": {
+            "$ref": "#/components/responses/Status409"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ownerBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "responses": {
+      "Status400": {
+        "description": "INVALID_REQUEST | INVALID_REVISION | INVALID_POLICY",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "INVALID_REQUEST",
+                    "INVALID_REVISION",
+                    "INVALID_POLICY"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status401": {
+        "description": "UNAUTHENTICATED",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "WWW-Authenticate": {
+            "schema": {
+              "type": "string",
+              "const": "Bearer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "UNAUTHENTICATED"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status403": {
+        "description": "STEP_UP_REQUIRED",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "STEP_UP_REQUIRED"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status404": {
+        "description": "NOT_FOUND",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "NOT_FOUND"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status405": {
+        "description": "METHOD_NOT_ALLOWED",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "Allow": {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "GET, PUT",
+                "GET",
+                "POST"
+              ]
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "METHOD_NOT_ALLOWED"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status412": {
+        "description": "MEMBERSHIP_CHANGED | ASSIGNMENT_CHANGED",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "MEMBERSHIP_CHANGED",
+                    "ASSIGNMENT_CHANGED"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status413": {
+        "description": "POLICY_TOO_LARGE",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "POLICY_TOO_LARGE"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status415": {
+        "description": "JSON_REQUIRED",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "JSON_REQUIRED"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status428": {
+        "description": "REVISION_REQUIRED",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "REVISION_REQUIRED"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Status503": {
+        "description": "OWNER_CONTROL_UNAVAILABLE",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "OWNER_CONTROL_UNAVAILABLE"
+                  ]
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Membership": {
+        "description": "Authorized owner membership projection",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "ETag": {
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}\"$"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/MembershipResponse"
+            }
+          }
+        }
+      },
+      "Assignment": {
+        "description": "Authorized assignment status",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "ETag": {
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[A-Za-z0-9_-]{1,128}\"$"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AssignmentResponse"
+            }
+          }
+        }
+      },
+      "Status409": {
+        "description": "Active teacher and student memberships in this tenant are required.",
+        "headers": {
+          "X-Request-Id": {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "code",
+                "requestId"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "const": "ASSIGNMENT_PARTICIPANTS_UNAVAILABLE"
+                },
+                "requestId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "MembershipPolicy": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role",
+          "active"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "teacher",
+              "student",
+              "institute_manager"
+            ]
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MembershipResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "membership",
+          "requestId"
+        ],
+        "properties": {
+          "membership": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tenantId",
+              "actorId",
+              "role",
+              "active"
+            ],
+            "properties": {
+              "tenantId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "actorId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "teacher",
+                  "student",
+                  "institute_manager"
+                ]
+              },
+              "active": {
+                "type": "boolean"
+              }
+            }
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AssignmentResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assignment",
+          "requestId"
+        ],
+        "properties": {
+          "assignment": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tenantId",
+              "teacherId",
+              "studentId",
+              "status"
+            ],
+            "properties": {
+              "tenantId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "teacherId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "studentId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,128}$"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "revoked"
+                ]
+              }
+            }
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    }
+  }
+}
