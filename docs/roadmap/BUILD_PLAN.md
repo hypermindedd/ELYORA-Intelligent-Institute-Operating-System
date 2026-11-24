@@ -1,4 +1,7 @@
 # EI-OS phased build plan — dependencies and acceptance gates
+
+The [governed Institute blueprint](../architecture/GOVERNED_INSTITUTE_BLUEPRINT_FA.md#۷-نقاط-عطف-و-شواهد-قابل-بازگشت) describes the proposed sequence for turning the existing PR stack into the first connected slice.
+
 | Stage | Deliverable | Acceptance gate | Status |
 |---|---|---|---|
 | A0 | source and BUILD-23/24 audit, QA/agent inventory | sources/unknowns recorded | PARTIAL |
