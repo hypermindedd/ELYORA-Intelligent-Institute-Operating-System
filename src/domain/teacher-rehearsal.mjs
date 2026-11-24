@@ -6,10 +6,11 @@ const hasText = value => typeof value === "string" && value.trim().length > 0;
 
 // Trusted in-process rehearsal only. The caller supplies fresh server-side identity
 // and case assignments. No persistence, media, provider calls or credential writes.
-export function createTeacherRehearsal({ tenantId, teacherId, reviewerId, managerId, variety, consent }) {
+export function createTeacherRehearsal({ tenantId, teacherId, reviewerId, managerId, variety, consent, followUpDueAt = null }) {
   if (consent !== true || ![tenantId, teacherId, reviewerId, managerId].every(hasText) ||
       reviewerId === teacherId || managerId === teacherId) throw Error("INVALID_CASE");
   if (!hasText(variety) || !Object.hasOwn(rubric.packs, variety)) throw Error("PACK_UNAVAILABLE");
+  if (followUpDueAt !== null && (typeof followUpDueAt !== "string" || !Number.isFinite(Date.parse(followUpDueAt)))) throw Error("INVALID_FOLLOW_UP_DATE");
   let taskIndex = 0;
   let stage = "opening";
   let withdrawn = false;
@@ -79,10 +80,40 @@ export function createTeacherRehearsal({ tenantId, teacherId, reviewerId, manage
         const status = evidence.length ? "HUMAN_OBSERVED" : rubric.audioOnly.includes(dimension) ? "AUDIO_REQUIRED" : "NOT_OBSERVED";
         return { dimension, status, evidence };
       });
-      return { mode: "OFFLINE_REHEARSAL", rubricVersion: rubric.version, teacherId, variety, reviewedBy: reviewerId,
+      const followUp = dimensions.filter(row => row.status !== "HUMAN_OBSERVED").map(row => ({
+        dimension: row.dimension, action: row.status === "AUDIO_REQUIRED" ? "COLLECT_AUDIO" : "OBSERVE_TASK",
+        taskIds: rubric.tasks.filter(task => task.dimensions.includes(row.dimension)).map(task => task.id)
+      }));
+      return { reviewQueue: followUp.length ? "COLLECT_EVIDENCE" : "HUMAN_REVIEW",
+        followUp: { assignedTo: reviewerId, dueAt: followUpDueAt, items: followUp }, mode: "OFFLINE_REHEARSAL", rubricVersion: rubric.version, teacherId, variety, reviewedBy: reviewerId,
         dimensions, professionalLevel: "NOT_ISSUED" };
     }
   };
 }
 
 export const rehearsalAnchors = Object.freeze({ ...rubric.anchors });
+
+// An owner-only practice object has no personnel case, release or management projection.
+// Private replies stay with the teacher. Only the authored learner prompts enter this model.
+export function openPrivateWorkshop({ owner, variety, taskId }) {
+  if (owner?.role !== "teacher" || owner.serverAuthenticated !== true ||
+      !hasText(owner.actorId) || !hasText(owner.tenantId)) throw Error("TEACHER_DENIED");
+  if (!hasText(variety) || !Object.hasOwn(rubric.packs, variety)) throw Error("PACK_UNAVAILABLE");
+  const task = rubric.tasks.find(task => task.id === taskId);
+  if (!task) throw Error("UNKNOWN_TASK");
+  const ownerId = owner.actorId, tenantId = owner.tenantId;
+  const [opening, clarification, transfer] = rubric.packs[variety][taskId];
+  function checkOwner(actor) {
+    if (actor?.serverAuthenticated !== true || actor.role !== "teacher" ||
+        actor.actorId !== ownerId || actor.tenantId !== tenantId) throw Error("PRIVATE_WORKSHOP_DENIED");
+  }
+  return {
+    prompt(actor, step) {
+      checkOwner(actor);
+      const lines = { opening, clarification, transfer };
+      if (!Object.hasOwn(lines, step)) throw Error("UNKNOWN_STEP");
+      return lines[step];
+    }
+  };
+}
+export const rehearsalTopics = Object.freeze(rubric.tasks.map(task => task.id));
