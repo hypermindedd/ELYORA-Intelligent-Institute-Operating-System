@@ -1,3 +1,4 @@
+import { roomDirectory } from "./room-activities.mjs";
 import locales from "./locale-registry.mjs";
 import ar from "./messages/ar.mjs";
 import de from "./messages/de.mjs";
@@ -41,12 +42,7 @@ const t = (key) => translations[state.uiLocale][key];
 function localizedLanguageName(language) {
   if (state.uiLocale === "fa-IR") return language.displayNameFa;
   if (state.uiLocale === "en-US") return language.displayNameEn;
-  if (!languageNames.has(state.uiLocale) && typeof Intl.DisplayNames === "function") {
-    languageNames.set(state.uiLocale, new Intl.DisplayNames(state.uiLocale, {
-      type:"language", fallback:"none", languageDisplay:"standard"
-    }));
-  }
-  return languageNames.get(state.uiLocale)?.of(language.code) ?? language.autonym;
+  return displayLabel("language", language.code, language.autonym);
 }
 
 function sectionHeading(kicker,title,description) {
@@ -64,7 +60,7 @@ function hero(view) {
   const firstButton = isCampus
     ? '<button type="button" class="button-primary" data-view="student">' + escapeHtml(t("enterStudio")) + ' <span aria-hidden="true">↗</span></button>'
     : '<button type="button" class="button-primary" data-action="preview">' + escapeHtml(t("roomStatus")) + '</button>';
-  return '<section class="hero" aria-label="' + escapeHtml(t(isCampus ? "campus" : view)) + '">' +
+  return '<section class="hero" data-workspace="' + view + '" aria-label="' + escapeHtml(t(isCampus ? "campus" : view)) + '">' +
     '<div class="hero-copy"><span class="eyebrow">' + escapeHtml(t(subtitle)) + '</span>' +
     '<h1>' + escapeHtml(t(heading[0])) + ' <em>' + escapeHtml(t(heading[1])) + '</em></h1>' +
     '<p>' + escapeHtml(t(desc)) + '</p><div class="hero-actions">' + firstButton +
@@ -83,6 +79,25 @@ function rooms() {
     escapeHtml(t("openPreview")) + ' <span aria-hidden="true">↗</span></button></div></article>'
   ).join("") + '</div>';
 }
+function displayLabel(type, code, fallback = code) {
+  const key = state.uiLocale + ":" + type;
+  if (typeof Intl.DisplayNames !== "function") return fallback;
+  if (!languageNames.has(key)) {
+    languageNames.set(key, new Intl.DisplayNames(state.uiLocale, {type, fallback:"none"}));
+  }
+  return languageNames.get(key).of(code) ?? fallback;
+}
+
+function programPassport(language) {
+  const variants = language.plannedLocaleVariants.map((tag) =>
+    '<li>' + escapeHtml(displayLabel("language", tag)) + ' <bdi dir="ltr">' +
+    escapeHtml(tag) + '</bdi></li>').join("");
+  return '<details class="program-passport"><summary>' + escapeHtml(t("programProfile")) +
+    '</summary><dl><dt>' + escapeHtml(t("writingSystem")) + '</dt><dd>' +
+    escapeHtml(displayLabel("script", language.script)) + '</dd><dt>' +
+    escapeHtml(t("regionalTracks")) + '</dt><dd><ul>' + variants +
+    '</ul></dd></dl></details>';
+}
 function languageCard(language) {
   const name = localizedLanguageName(language);
   const direction = language.direction === "rtl" ? "rtl" : "ltr";
@@ -92,7 +107,7 @@ function languageCard(language) {
     '</div><div class="language-body"><strong lang="' + escapeHtml(language.code) + '"><bdi dir="' +
     direction + '">' + escapeHtml(language.autonym) + '</bdi></strong><small dir="auto">' +
     escapeHtml(name) + '</small></div>' +
-    '<span class="language-status">' + escapeHtml(t("planned")) + '</span></article>';
+    '<span class="language-status">' + escapeHtml(t("planned")) + '</span>' + programPassport(language) + '</article>';
 }
 function languageCards() {
   const {catalog, filter} = state;
@@ -137,6 +152,7 @@ function renderMain() {
     body += sectionHeading("strengthsKicker","strengthsTitle","strengthsDescription");
     body += features(featureList);
   } else {
+    body += roomDirectory(state.view, t, escapeHtml);
     body += '<div class="section-bar"><div><span class="section-kicker">' + escapeHtml(t("roomBadge")) +
       '</span><h2 class="section-title">' + escapeHtml(t("roomFocus")) + '</h2>' +
       '<p class="section-caption">' + escapeHtml(t("programContext")) + '</p></div></div>';
@@ -206,8 +222,16 @@ document.addEventListener("change", (event) => {
     } catch {
       // The current view can still use the selected language.
     }
+    const workshop = document.querySelector('[data-room="tomorrows-class"]');
+    const note = workshop?.querySelector("textarea")?.value;
+    const open = workshop?.open;
     localizeFrame();
     renderMain();
+    if (typeof note === "string") {
+      const restored = document.querySelector('[data-room="tomorrows-class"]');
+      restored.open = open;
+      restored.querySelector("textarea").value = note;
+    }
   }
   if (event.target.id === "program-language" && state.catalog) {
     const choice = event.target.value;

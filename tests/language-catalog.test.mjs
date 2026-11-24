@@ -68,3 +68,15 @@ test("an additional provisional program does not require changing the launch pla
  assert.equal(publicCatalogProjection(x).languages.length,expectedProgramCodes.length + 1);
  assert.equal(publicCatalogProjection(x).plannedLaunchLanguageCount,8);
 });
+
+test("catalog variants preserve target language, canonical form and explicit program script", () => {
+  for (const [code, tags] of [
+    ["ja", ["en-US"]], ["fr", ["fr-ca"]], ["es", ["es-MX", "es-MX"]],
+    ["zh-Hans", ["zh-Hant-TW"]], ["ar", ["ar-invalidtoolong"]]
+  ]) {
+    const catalog = clone();
+    catalog.languages.find(language => language.code === code).plannedLocaleVariants = tags;
+    assert.ok(validateLanguageCatalog(catalog).errors.includes("INVALID_VARIANT"), code);
+    assert.throws(() => publicCatalogProjection(catalog), /INVALID_VARIANT/);
+  }
+});

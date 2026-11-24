@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "rooms": [
+    {"id":"story-studio","workspace":"student","experience":"story","availability":"sample"},
+    {"id":"listening-lab","workspace":"student","experience":"listening","availability":"planned"},
+    {"id":"class-stories","workspace":"student","experience":"classStories","availability":"planned"},
+    {"id":"tomorrows-class","workspace":"teacher","experience":"workshop","availability":"sample"},
+    {"id":"pronunciation-clinic","workspace":"teacher","experience":"pronunciation","availability":"planned"},
+    {"id":"teacher-coaching","workspace":"teacher","experience":"coaching","availability":"planned"},
+    {"id":"discussion-circle","workspace":"classroom","experience":"discussion","availability":"planned"},
+    {"id":"story-circle","workspace":"classroom","experience":"storyCircle","availability":"planned"},
+    {"id":"pair-practice","workspace":"classroom","experience":"pairPractice","availability":"planned"},
+    {"id":"evidence-desk","workspace":"command","experience":"evidence","availability":"sample"},
+    {"id":"program-launch","workspace":"command","experience":"programLaunch","availability":"planned"}
+  ]
+}
