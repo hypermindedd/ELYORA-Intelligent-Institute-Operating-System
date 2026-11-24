@@ -61,3 +61,31 @@ test("consent, pack, independent assigned reviewer and early stop", () => {
   assert.throws(() => s.turn(r), /WITHDRAWN/);
   assert.throws(() => s.release(r), /WITHDRAWN/);
 });
+
+test("private workshop supports voluntary replay without management access or release", async () => {
+  const { openPrivateWorkshop } = await import("../src/domain/teacher-rehearsal.mjs");
+  const session = openPrivateWorkshop({ owner: teacher, variety: "fr-FR", taskId: "rule" });
+  assert.ok(session.prompt(teacher, "transfer"));
+  assert.equal(session.prompt(teacher,"opening"), session.prompt(teacher,"opening"));
+  for (const actor of [m, r, {...teacher,actorId:"another"}, {...teacher,tenantId:"other"}]) {
+    assert.throws(() => session.prompt(actor,"opening"), /DENIED/);
+  }
+  assert.equal(session.release, undefined);
+  assert.equal(session.managementReport, undefined);
+});
+test("an empty reviewed case is routed to a specific evidence owner and due date", () => {
+  const due = "2026-12-01T12:00:00Z";
+  const s = create({followUpDueAt:due});
+  while (s.turn(r).stage !== "complete") {
+    const t = s.turn(r);
+    if (t.stage === "observe") s.observe(r,t,[]);
+    else s.respond(r,t,"understood");
+  }
+  s.release(r);
+  const { reviewQueue, followUp } = s.managementReport(m);
+  assert.equal(reviewQueue,"COLLECT_EVIDENCE");
+  assert.equal(followUp.assignedTo,r.actorId);
+  assert.equal(followUp.dueAt,due);
+  assert.equal(followUp.items.filter(x => x.action === "COLLECT_AUDIO").length,5);
+  assert.ok(followUp.items.filter(x => x.action === "OBSERVE_TASK").every(x => x.taskIds.length));
+});

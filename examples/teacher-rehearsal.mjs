@@ -1,6 +1,6 @@
 // Two-person, local text rehearsal. Fictional principals only, no network or recording.
 import { createInterface } from "node:readline";
-import { createTeacherRehearsal, rehearsalAnchors } from "../src/domain/teacher-rehearsal.mjs";
+import { createTeacherRehearsal, rehearsalAnchors, openPrivateWorkshop, rehearsalTopics } from "../src/domain/teacher-rehearsal.mjs";
 
 const variety = process.argv[2] ?? "fr-FR";
 const input = createInterface({ input: process.stdin, output: process.stdout });
@@ -26,6 +26,19 @@ async function choose(prompt, options) {
 async function run() {
   console.log("Elyora Institute · local rehearsal · fictional case. No audio or real personnel report. Use /stop anywhere.");
   if (await choose("Teacher: a simulated learner will sometimes make deliberate mistakes. Continue? yes/no", ["yes", "no"]) !== "yes") return;
+  const mode = await choose("Choose private for solo practice, or reviewed for a separate fictional management case.", ["private", "reviewed"]);
+  if (mode === "private") {
+    const owner = { role: "teacher", actorId: "demo-teacher", tenantId, serverAuthenticated: true };
+    const taskId = await choose("Choose a topic: " + rehearsalTopics.join(", "), rehearsalTopics);
+    const workshop = openPrivateWorkshop({ owner, variety, taskId });
+    let step = "opening";
+    while (step !== "finish") {
+      console.log(workshop.prompt(owner, step));
+      await ask("Try an explanation privately, then press Enter. Your answer is not saved.");
+      step = await choose("Choose clarification, transfer, opening to retry, or finish.", ["clarification", "transfer", "opening", "finish"]);
+    }
+    return;
+  }
   const session = createTeacherRehearsal({ tenantId, teacherId: "demo-teacher", managerId: manager.actorId,
     reviewerId: reviewer.actorId, variety, consent: true });
   while (true) {
