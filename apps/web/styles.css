@@ -177,3 +177,49 @@ html:lang(ko) :is(.hero-copy h1,.section-title,.space-card h3){word-break:keep-a
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+/* Workspace accents complement the original warm campus scenes. */
+.hero {
+  --workspace-ink: #0c514c;
+  --workspace-paper: #e6f5ec;
+  --workspace-metal: #d4ad60;
+  background: linear-gradient(125deg, var(--workspace-paper), var(--ivory) 66%);
+  border-block-start: 4px solid var(--workspace-metal);
+}
+.hero[data-workspace="teacher"] {
+  --workspace-ink: #513866;
+  --workspace-paper: #f0e9f3;
+  --workspace-metal: #ab853f;
+}
+.hero[data-workspace="classroom"] {
+  --workspace-ink: #863e31;
+  --workspace-paper: #faebe0;
+  --workspace-metal: #b7694d;
+}
+.hero[data-workspace="command"] {
+  --workspace-ink: #293f58;
+  --workspace-paper: #e8eff0;
+  --workspace-metal: #ae8e52;
+}
+.hero .eyebrow, .hero-copy h1 em { color: var(--workspace-ink); }
+.hero .button-primary { background: var(--workspace-ink); color: white; box-shadow: none; }
+.hero .eyebrow::before { background: var(--workspace-metal); }
+.program-passport {
+  flex: 1 0 100%;
+  min-inline-size: 0;
+  border-block-start: 1px solid var(--line);
+  color: var(--text);
+  font-size: .83rem;
+}
+.program-passport summary {
+  color: var(--tiffany-dark);
+  padding-block: .65rem;
+  cursor: pointer;
+  font-weight: 750;
+}
+.program-passport summary:focus-visible { outline: 3px solid #a33d36; outline-offset: 2px; }
+.program-passport dl { margin: 0; }
+.program-passport dt { color: var(--muted); font-size: .76rem; }
+.program-passport dd { margin: 0 0 .6rem; overflow-wrap: anywhere; }
+.program-passport ul { list-style: none; padding: 0; margin: 0; }
+.program-passport bdi { font-size: .73rem; color: var(--muted); }
