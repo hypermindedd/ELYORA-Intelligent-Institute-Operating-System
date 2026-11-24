@@ -117,5 +117,15 @@
       "type": "string",
       "minLength": 1
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["status"], "properties": { "status": { "const": "approved" } } },
+      "then": { "required": ["approvedBy"] }
+    },
+    {
+      "if": { "required": ["status"], "properties": { "status": { "const": "revoked" } } },
+      "then": { "required": ["revokedAt"] }
+    }
+  ]
 }

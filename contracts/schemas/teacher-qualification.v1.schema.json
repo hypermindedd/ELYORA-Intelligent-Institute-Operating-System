@@ -60,5 +60,16 @@
       "type": "string",
       "format": "date-time"
     }
+  },
+  "if": {
+    "required": ["reviewerDecision"],
+    "properties": { "reviewerDecision": { "const": "approve" } }
+  },
+  "then": {
+    "properties": {
+      "consentRecorded": { "const": true },
+      "credentialsVerified": { "const": true },
+      "evidence": { "minItems": 1 }
+    }
   }
 }

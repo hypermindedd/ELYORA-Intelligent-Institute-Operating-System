@@ -37,10 +37,12 @@
       ]
     },
     "ownerId": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "classId": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "startsAt": {
       "type": "string",
@@ -50,5 +52,18 @@
       "type": "string",
       "format": "date-time"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["roomType"], "properties": { "roomType": { "const": "classroom" } } },
+      "then": { "required": ["classId"] }
+    },
+    {
+      "if": {
+        "required": ["roomType"],
+        "properties": { "roomType": { "enum": ["student_private", "teacher_private"] } }
+      },
+      "then": { "required": ["ownerId"] }
+    }
+  ]
 }
