@@ -58,3 +58,7 @@ Use the navigation to switch cabin concepts; language selector filters planned l
 Browser screenshot evidence: [GitHub Actions campus preview run](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/actions/runs/42387402158) (artifact: `ei-os-campus-visual-evidence`).
 
 Use `npm run build:campus` to create the static preview in `dist/`. The same output can be served from a nested directory with a trailing slash, such as `/campus/`. The preview contains only public catalog fields.
+
+### Teacher qualification rehearsal
+
+Run `npm run demo:teacher -- fr-FR` or `npm run demo:teacher -- en-GB` for a moderated text rehearsal with fictional identities. The independent reviewer chooses the learner's follow-up and records task-specific observations. See the [qualification protocol](docs/architecture/TEACHER_LIVE_ASSESSMENT_FA.md) for evidence limits and the scoped live-voice pilot.
