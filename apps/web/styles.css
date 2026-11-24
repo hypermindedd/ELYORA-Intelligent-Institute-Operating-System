@@ -223,3 +223,13 @@ html:lang(ko) :is(.hero-copy h1,.section-title,.space-card h3){word-break:keep-a
 .program-passport dd { margin: 0 0 .6rem; overflow-wrap: anywhere; }
 .program-passport ul { list-style: none; padding: 0; margin: 0; }
 .program-passport bdi { font-size: .73rem; color: var(--muted); }
+
+.room-directory { margin-block: 2rem; }
+.room-directory h2 { color:var(--text); margin-block-end: .65rem; }
+.room-entry { background: var(--ivory); border: 1px solid var(--line); border-radius: 14px; padding: .9rem 1.1rem; margin-block: .5rem; overflow-wrap: anywhere; }
+.room-entry h3, .room-entry p { margin-block: .3em; }
+.room-entry summary { cursor: pointer; padding-block: .35rem; font-weight: 700; }
+.room-entry summary:focus-visible, .room-entry textarea:focus-visible { outline: 3px solid #12645e; outline-offset: 2px; }
+.room-entry textarea { display: block; width:100%; margin-block: .5rem; font:inherit; color:inherit; padding:.5rem; }
+.room-story { margin-block:.5rem; border-block-start:1px solid var(--line); }
+.room-story details { margin-inline:1rem; }

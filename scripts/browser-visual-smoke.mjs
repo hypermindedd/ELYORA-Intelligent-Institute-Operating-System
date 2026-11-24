@@ -192,6 +192,31 @@ try {
   await checkLanguageMonogramContrast(desktop);
   await checkPreviewAccount(desktop);
   await desktop.screenshot({path:"screenshots/campus-home-fa-desktop.png",fullPage:true,animations:"disabled"});
+  await desktop.locator('.nav-item[data-view="student"]').click();
+  const studio = desktop.locator('[data-room="story-studio"]');
+  await studio.locator(":scope > summary").click();
+  const french = studio.locator(".room-story").first();
+  await french.locator(":scope > summary").click();
+  const choice = french.locator("details").first();
+  await choice.locator(":scope > summary").click();
+  assert.ok(await choice.locator(":scope > p").isVisible());
+  const retry = choice.locator("details");
+  await retry.locator("summary").click();
+  assert.ok(await retry.locator("p").isVisible());
+  await studio.screenshot({path:"screenshots/room-story-choice.png"});
+  await desktop.locator('.nav-item[data-view="teacher"]').click();
+  const workshop = desktop.locator('[data-room="tomorrows-class"]');
+  await workshop.locator("summary").click();
+  await workshop.locator("textarea").fill("private-local-sample");
+  await checkLocale(desktop, "en-US");
+  assert.equal(await workshop.locator("textarea").inputValue(),"private-local-sample");
+  await desktop.locator('.nav-item[data-view="command"]').click();
+  assert.ok(!(await desktop.locator("#main").innerText()).includes("private-local-sample"));
+  await desktop.locator('.nav-item[data-view="teacher"]').click();
+  assert.equal(await workshop.locator("textarea").inputValue(),"");
+  await desktop.locator('.nav-item[data-view="classroom"]').click();
+  assert.equal(await desktop.locator('[data-room="discussion-circle"] button').count(),0);
+  await checkLocale(desktop,"fa-IR");
   const scenes = [];
   for (const [view,asset] of [
     ["student","student-studio"],["teacher","teacher-atelier"],

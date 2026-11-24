@@ -1,5 +1,7 @@
+import { readFileSync } from "node:fs";
 import { languageCatalog, publicCatalogProjection } from "../../src/catalog/languages.mjs";
 
+const rooms = JSON.parse(readFileSync(new URL("../../packages/room-directory/catalog.v1.json", import.meta.url), "utf8"));
 const text = "text/javascript; charset=utf-8";
 const roomAssets = ["student-studio", "teacher-atelier", "live-classroom", "command-center"];
 const messageFiles = languageCatalog.uiLocales.map(({code}) => "messages/" + code.split("-")[0] + ".mjs");
@@ -7,6 +9,7 @@ const messageFiles = languageCatalog.uiLocales.map(({code}) => "messages/" + cod
 export const staticResources = new Map([
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
+  ["/room-activities.mjs", ["room-activities.mjs", text]],
   ["/app.mjs", ["app.mjs", text]],
   ["/assets/fonts/vazirmatn-arabic.woff2", ["assets/fonts/vazirmatn-arabic.woff2", "font/woff2"]],
   ["/assets/fonts/OFL-Vazirmatn.txt", ["assets/fonts/OFL-Vazirmatn.txt", "text/plain; charset=utf-8"]],
@@ -21,6 +24,7 @@ export const staticResources = new Map([
 
 export const catalogPath = "/api/demo/languages.json";
 export const generatedResources = new Map([
+  ["/room-directory.mjs", [text, () => "export default " + JSON.stringify(rooms) + ";\n"]],
   ["/locale-registry.mjs", [text, () => "export default " + JSON.stringify(languageCatalog.uiLocales) + ";\n"]],
   [catalogPath, ["application/json; charset=utf-8", () => JSON.stringify(publicCatalogProjection())]]
 ]);

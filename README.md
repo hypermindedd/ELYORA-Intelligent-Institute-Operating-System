@@ -58,3 +58,9 @@ Use the navigation to switch cabin concepts; language selector filters planned l
 Browser screenshot evidence: [GitHub Actions campus preview run](https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/actions/runs/42387402158) (artifact: `ei-os-campus-visual-evidence`).
 
 Use `npm run build:campus` to create the static preview in `dist/`. The same output can be served from a nested directory with a trailing slash, such as `/campus/`. The preview contains only public catalog fields.
+
+### Specialty rooms and media lab
+
+Open the student, teacher, classroom or command workspace in the campus preview to discover specialty rooms. Story Studio includes two authored branching text samples. The private workshop keeps its scratchpad only in the current view. The evidence desk is a fictional example.
+
+Run `npm run demo:live` for the separate local WebRTC audio lab. Open its companion link in the same browser, explicitly enable microphones on both tabs and use headphones. The lab uses a temporary local signaling channel with no TURN, recordings, school identity or remote admission. For live product dependencies and future products see [the room architecture](docs/architecture/ROOM_PRODUCTS_FA.md).
