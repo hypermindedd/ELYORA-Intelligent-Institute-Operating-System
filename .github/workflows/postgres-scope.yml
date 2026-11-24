@@ -4,6 +4,7 @@ on:
     paths:
       - '.github/workflows/postgres-scope.yml'
       - 'db/migrations/**'
+      - 'db/access/**'
       - 'integration/postgres-learning-scope.mjs'
       - 'src/adapters/**'
       - 'src/application/**'

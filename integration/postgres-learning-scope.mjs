@@ -75,33 +75,6 @@ before(async () => {
     await admin.query(readFileSync(new URL("../db/migrations/" + migration, import.meta.url), "utf8"));
   }
   await admin.query(`
-    CREATE ROLE ei_scope_test LOGIN PASSWORD 'ei_scope_test' NOSUPERUSER NOBYPASSRLS;
-    GRANT USAGE ON SCHEMA ei_scope TO ei_scope_test;
-    GRANT SELECT ON ALL TABLES IN SCHEMA ei_scope TO ei_scope_test;
-    GRANT UPDATE (actor_id) ON ei_scope.membership TO ei_scope_test;
-    GRANT UPDATE (revision) ON ei_scope.assignment TO ei_scope_test;
-    GRANT UPDATE (document, revision) ON ei_scope.directive TO ei_scope_test;
-    GRANT INSERT ON ei_scope.outbox TO ei_scope_test;
-
-    CREATE ROLE ei_outbox_test LOGIN PASSWORD 'ei_outbox_test' NOSUPERUSER NOBYPASSRLS;
-    GRANT USAGE ON SCHEMA ei_scope TO ei_outbox_test;
-    GRANT SELECT ON ei_scope.outbox TO ei_outbox_test;
-    GRANT UPDATE (available_at, attempt_count, lease_token, lease_until, delivered_at, dead_lettered_at)
-      ON ei_scope.outbox TO ei_outbox_test;
-
-    CREATE ROLE ei_invalidation_test LOGIN PASSWORD 'ei_invalidation_test' NOSUPERUSER NOBYPASSRLS;
-    GRANT USAGE ON SCHEMA ei_scope TO ei_invalidation_test;
-    GRANT INSERT ON ei_scope.scope_invalidation TO ei_invalidation_test;
-
-    CREATE ROLE ei_owner_test LOGIN PASSWORD 'ei_owner_test' NOSUPERUSER NOBYPASSRLS;
-    GRANT USAGE ON SCHEMA ei_scope TO ei_owner_test;
-    GRANT SELECT ON ei_scope.membership TO ei_owner_test;
-    GRANT UPDATE (role, active, revision) ON ei_scope.membership TO ei_owner_test;
-    GRANT INSERT ON ei_scope.membership_audit TO ei_owner_test;
-    GRANT SELECT ON ei_scope.assignment TO ei_owner_test;
-    GRANT UPDATE (status, revision) ON ei_scope.assignment TO ei_owner_test;
-    GRANT INSERT ON ei_scope.assignment_revocation_audit TO ei_owner_test;
-
     INSERT INTO ei_scope.membership (tenant_id, actor_id, role, active) VALUES
       ('tenant-a', 'teacher', 'teacher', true), ('tenant-a', 'student', 'student', true),
       ('tenant-a', 'manager', 'institute_manager', true),
@@ -149,10 +122,14 @@ before(async () => {
   await seed("tenant-other", "scope-delivery");
   await seed("tenant-owner", "scope-owner");
   await admin.query(readFileSync(new URL("../db/migrations/005_owner_assignment_grant.sql", import.meta.url), "utf8"));
+  for (const file of ["001_runtime_groups.sql", "002_scope_grants.sql"]) {
+    await admin.query(readFileSync(new URL("../db/access/" + file, import.meta.url), "utf8"));
+  }
   await admin.query(`
-    GRANT INSERT (tenant_id, teacher_id, student_id, revision, status) ON ei_scope.assignment TO ei_owner_test;
-    GRANT UPDATE (generation) ON ei_scope.assignment TO ei_owner_test;
-    GRANT INSERT ON ei_scope.assignment_grant_audit TO ei_owner_test;
+    CREATE ROLE ei_scope_test LOGIN PASSWORD 'ei_scope_test' IN ROLE ei_scope_api;
+    CREATE ROLE ei_outbox_test LOGIN PASSWORD 'ei_outbox_test' IN ROLE ei_scope_delivery;
+    CREATE ROLE ei_invalidation_test LOGIN PASSWORD 'ei_invalidation_test' IN ROLE ei_scope_projection;
+    CREATE ROLE ei_owner_test LOGIN PASSWORD 'ei_owner_test' IN ROLE ei_scope_governance;
 
     CREATE FUNCTION ei_scope.reject_fixture_grant_audit() RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
@@ -191,7 +168,15 @@ test("tenant keys, row policies, and role-specific API views isolate the same di
     await reader.query("BEGIN");
     await reader.query("SELECT set_config('ei_os.tenant_id', 'tenant-a', true)");
     assert.equal((await reader.query("SELECT * FROM ei_scope.directive WHERE tenant_id = 'tenant-b'")).rowCount, 0);
-    assert.equal((await reader.query("SELECT * FROM ei_scope.outbox")).rowCount, 1);
+    const delivery = await workerPool.connect();
+    try {
+      await delivery.query("BEGIN");
+      await delivery.query("SELECT set_config('ei_os.tenant_id', 'tenant-a', true)");
+      assert.equal((await delivery.query("SELECT * FROM ei_scope.outbox")).rowCount, 1);
+    } finally {
+      await delivery.query("ROLLBACK");
+      delivery.release();
+    }
     await reader.query("ROLLBACK");
     assert.equal((await reader.query("SELECT * FROM ei_scope.directive")).rowCount, 0);
   } finally {
@@ -484,4 +469,11 @@ test("re-grant keeps earlier scopes closed and authorizes a new directive", asyn
     WHERE tenant_id = 'tenant-owner' ORDER BY directive_id`);
   assert.equal(rows.length, 2);
   assert.notEqual(rows[0].assignment_generation, rows[1].assignment_generation);
+});
+
+test("service groups isolate delivery, private records and governance history", async () => {
+  await assert.rejects(pool.query("SELECT envelope FROM ei_scope.outbox"), { code: "42501" });
+  await assert.rejects(pool.query("SELECT * FROM ei_scope.membership_audit"), { code: "42501" });
+  await assert.rejects(sinkPool.query("SELECT * FROM ei_scope.scope_invalidation"), { code: "42501" });
+  await assert.rejects(ownerPool.query("SELECT * FROM ei_scope.outbox"), { code: "42501" });
 });
