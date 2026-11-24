@@ -100,10 +100,10 @@ nav{display:flex;flex-direction:column;gap:7px}
 .language-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .language-card{flex-wrap:wrap;border:1px solid var(--line);background:#fff;border-radius:18px;padding:15px;display:flex;align-items:center;gap:11px;min-width:0}
 .language-card:hover{border-color:#aee7df}
-.language-monogram{flex:0 0 44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#e1f8f4;color:#168277;font-size:17px;font-weight:900}
-.language-card:nth-child(4n+2) .language-monogram{background:#fff0db;color:#b5682a}
-.language-card:nth-child(4n+3) .language-monogram{background:#ffece9;color:#c85d50}
-.language-card:nth-child(4n+4) .language-monogram{background:#fff7ce;color:#ac8133}
+.language-monogram{flex:0 0 44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#e1f8f4;color:var(--tiffany-dark);font-size:17px;font-weight:900}
+.language-card:nth-child(4n+2) .language-monogram{background:#fff0db;color:#92501f}
+.language-card:nth-child(4n+3) .language-monogram{background:#ffece9;color:#9e4038}
+.language-card:nth-child(4n+4) .language-monogram{background:#fff7ce;color:#7d5b1e}
 .language-body{min-width:0;flex:1 1 75px}
 .language-body strong{font-size:13px;display:block;overflow-wrap:anywhere}
 .language-body small{display:block;overflow-wrap:anywhere;color:var(--muted);font-size:11px}
@@ -116,7 +116,7 @@ nav{display:flex;flex-direction:column;gap:7px}
 .feature-card h3{font-size:14px;margin:4px 0}
 .feature-card p{font-size:12px;line-height:1.9;color:var(--muted);margin:0}
 .notice-strip{display:flex;align-items:flex-start;gap:11px;border:1px solid #e5eadf;background:#f5fbef;border-radius:14px;padding:12px 17px;margin-top:27px;color:#587066;font-size:11px}
-.notice-strip strong{font-size:14px;color:#4a8a72}
+.notice-strip strong{font-size:14px;color:var(--tiffany-dark)}
 .site-footer{padding:15px clamp(18px,3.4vw,54px) 19px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;font-size:10px;color:#6b6257}
 dialog{max-width:min(420px,calc(100vw - 36px));border:1px solid #f1dacc;border-radius:22px;padding:28px 31px;background:#fffdf9;box-shadow:var(--shadow);color:var(--ink)}
 dialog::backdrop{background:rgba(35,43,42,.45)}
