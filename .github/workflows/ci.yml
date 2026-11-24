@@ -16,5 +16,12 @@ jobs:
           node-version: '22'
       - name: Offline schema structural lint and domain tests
         run: npm run check
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install contract test dependencies
+        run: python -m pip install -r scripts/requirements-contract-tests.txt
+      - name: Validate Institute draft contracts and example records
+        run: python scripts/check-draft-contract-examples.py
       - name: Offline vertical slice simulation (no ELYORA)
         run: npm run demo
