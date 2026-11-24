@@ -1,0 +1,49 @@
+{
+  "version": "I10-rehearsal-1",
+  "anchors": {
+    "SUPPORT_NEEDED": "A material misconception remained or the teacher could not correct it in this task.",
+    "WITH_PROMPT": "The teacher demonstrated the indicator after a targeted prompt.",
+    "INDEPENDENT": "The teacher demonstrated the indicator independently in this task."
+  },
+  "indicators": {
+    "comprehension": "Recovers the speaker or writer's intended meaning and cites a contextual clue.",
+    "subject_control": "Provides a correct, appropriately scoped explanation of the teaching point.",
+    "grammar_exceptions": "Explains the limit of a rule with a counterexample.",
+    "natural_usage": "Supplies an idiomatic expression appropriate to relationship and register.",
+    "proverbs": "Interprets figurative meaning and identifies a context where the proverb would mislead.",
+    "error_diagnosis": "Locates the misconception and distinguishes it from a legitimate variant.",
+    "knowledge_transfer": "Elicits a fresh example to check whether the learner can apply the correction.",
+    "adaptation": "Changes the explanation or teaching method when the first one does not land.",
+    "interaction": "Invites clarification, corrects respectfully and gives the learner a turn.",
+    "class_leadership": "Balances participation and restores the learner's opportunity to contribute.",
+    "spoken_fluency": "Sustains spontaneous speech and repairs a breakdown without losing the message.",
+    "listening": "Resolves meaning from a new spoken passage without a transcript.",
+    "articulation": "Models and diagnoses a sound contrast that changes intelligibility in the stated variety.",
+    "prosody": "Uses and explains stress, rhythm and intonation that change intended meaning.",
+    "vocal_delivery": "Adjusts pace, pausing and audible tone to help a learner understand."
+  },
+  "audioOnly": ["spoken_fluency", "listening", "articulation", "prosody", "vocal_delivery"],
+  "tasks": [
+    { "id": "meaning", "dimensions": ["comprehension", "subject_control", "interaction"] },
+    { "id": "rule", "dimensions": ["grammar_exceptions", "error_diagnosis", "adaptation", "knowledge_transfer"] },
+    { "id": "register", "dimensions": ["natural_usage", "error_diagnosis", "interaction"] },
+    { "id": "proverb", "dimensions": ["proverbs", "comprehension", "knowledge_transfer"] },
+    { "id": "class", "dimensions": ["class_leadership", "adaptation", "interaction"] }
+  ],
+  "packs": {
+    "fr-FR": {
+      "meaning": ["Léa écrit : « Je devais venir, mais mon train a été annulé. » Donc elle est venue ?", "Je croyais que « devais » prouvait qu’elle était là. Quel indice ai-je manqué ?", "Et si je dis « Je devais appeler, et je l’ai fait », comment vérifiez-vous ce que j’ai compris ?"],
+      "rule": ["J’ai écrit « Si j’aurais le temps, je viendrais ». Pourquoi changer ma phrase ?", "Mais j’ai entendu « Je me demande si elle viendrait ». Pourquoi est-ce possible ?", "Je veux imaginer un voyage et aussi poser une question indirecte. Faites-moi produire les deux phrases."],
+      "register": ["Pour mon premier message à la directrice, je pensais écrire « Salut, tu me files le dossier ? ». Ça va ?", "Pourtant elle a dit « salut » hier. Comment choisir sans inventer une règle absolue ?", "Et pour un collègue que je connais bien ? Faites-moi reformuler les deux demandes."],
+      "proverb": ["« Petit à petit, l’oiseau fait son nid. » On parle vraiment d’un oiseau ici ?", "Alors je peux le dire à quelqu’un qui demande de l’aide dans une urgence ?", "Proposez deux situations et laissez-moi choisir celle qui convient. Demandez-moi pourquoi."],
+      "class": ["Dès que je commence une phrase, mon camarade la termine pour moi. Je préfère me taire.", "J’ai encore peur de répondre devant le groupe. Comment pourrait-on faire autrement ?", "Ma camarade et moi voulons essayer. Comment organisez-vous nos tours et vérifiez-vous que chacun a compris ?"]
+    },
+    "en-GB": {
+      "meaning": ["Sam wrote, ‘I was meant to call, but my phone died.’ That tells us Sam called, right?", "I thought ‘meant to’ settled it. Which part of the message matters here?", "What about ‘I was meant to call, and I did’? How would you check my interpretation?"],
+      "rule": ["I wrote ‘If I would have time, I would visit.’ Can you help me express an imagined situation?", "But I heard ‘If you would just listen, I could explain.’ Why can that speaker use ‘would’?", "Help me make a new imagined situation and a polite appeal, then check whether I can tell them apart."],
+      "register": ["I want to email a new client: ‘Give me the figures.’ It is grammatical, so it sounds fine, right?", "But a teammate said that yesterday. How do I decide how direct to be?", "Let me try the same request with a close teammate and with a new client. What should I listen for?"],
+      "proverb": ["‘Don't count your chickens before they hatch.’ Is this advice about farming here?", "Can I say that to a friend who has already received an award?", "Give me two new situations. Let me pick one and explain the difference."],
+      "class": ["My partner keeps finishing my sentences. I'd rather stop speaking.", "I'm still uncomfortable answering in front of everyone. Is there another way to try?", "We both want to try again. How will you share the turns and check what each of us learned?"]
+    }
+  }
+}
