@@ -207,6 +207,14 @@ try {
   }
 
   await checkProgram(desktop, "ar");
+  const passport = desktop.locator(".program-passport");
+  await passport.locator("summary").focus();
+  await desktop.keyboard.press("Enter");
+  assert.equal(await passport.evaluate(node => node.open), true);
+  assert.deepEqual(await passport.locator("li bdi").allTextContents(), ["ar-SA", "ar-EG", "ar-MA"]);
+  assert.equal(await desktop.locator("#ui-locale").inputValue(), "en-US");
+  await passport.screenshot({path:"screenshots/program-profile-ar-en.png"});
+
   const textBySurface = {
     title: new Set(), description: new Set(), hero: new Set(), catalog: new Set(),
     dialog: new Set(), navigationLabel: new Set(),
