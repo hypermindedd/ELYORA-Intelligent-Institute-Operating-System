@@ -5,7 +5,10 @@ on:
     paths:
       - 'apps/web/**'
       - 'packages/language-catalog/**'
+      - 'packages/room-directory/catalog.v1.json'
       - 'scripts/browser-visual-smoke.mjs'
+      - 'scripts/browser-audio-smoke.mjs'
+      - 'examples/live-audio/**'
       - '.github/workflows/campus-browser.yml'
   workflow_dispatch:
 permissions:
@@ -27,6 +30,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser interaction + screenshots
         run: node scripts/browser-visual-smoke.mjs
+      - name: Verify loopback-only peer audio fixture
+        run: node scripts/browser-audio-smoke.mjs
       - if: always()
         uses: actions/upload-artifact@v4
         with:

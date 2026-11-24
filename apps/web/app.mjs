@@ -1,3 +1,4 @@
+import { roomDirectory } from "./room-activities.mjs";
 import locales from "./locale-registry.mjs";
 import ar from "./messages/ar.mjs";
 import de from "./messages/de.mjs";
@@ -151,6 +152,7 @@ function renderMain() {
     body += sectionHeading("strengthsKicker","strengthsTitle","strengthsDescription");
     body += features(featureList);
   } else {
+    body += roomDirectory(state.view, t, escapeHtml);
     body += '<div class="section-bar"><div><span class="section-kicker">' + escapeHtml(t("roomBadge")) +
       '</span><h2 class="section-title">' + escapeHtml(t("roomFocus")) + '</h2>' +
       '<p class="section-caption">' + escapeHtml(t("programContext")) + '</p></div></div>';
@@ -220,8 +222,16 @@ document.addEventListener("change", (event) => {
     } catch {
       // The current view can still use the selected language.
     }
+    const workshop = document.querySelector('[data-room="tomorrows-class"]');
+    const note = workshop?.querySelector("textarea")?.value;
+    const open = workshop?.open;
     localizeFrame();
     renderMain();
+    if (typeof note === "string") {
+      const restored = document.querySelector('[data-room="tomorrows-class"]');
+      restored.open = open;
+      restored.querySelector("textarea").value = note;
+    }
   }
   if (event.target.id === "program-language" && state.catalog) {
     const choice = event.target.value;

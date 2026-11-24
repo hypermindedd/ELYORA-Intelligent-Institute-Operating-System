@@ -82,3 +82,15 @@ test("UI source distinguishes language filter from actual student authority",asy
  assert.match(script,/PREVIEW|previewNotice/);
  assert.doesNotMatch(script,/setMastery|grantRole/);
 });
+test("web directory uses the same versioned resource as the Kotlin clients",async()=>{
+  const {readFile} = await import("node:fs/promises");
+  const expected = JSON.parse(await readFile(new URL("../packages/room-directory/catalog.v1.json",import.meta.url),"utf8"));
+  const r = await fetch(base+"/room-directory.mjs");
+  assert.equal(r.status,200);
+  const serialized = /^export default (.+);\s*$/.exec(await r.text())[1];
+  assert.deepEqual(JSON.parse(serialized),expected);
+  for(const {code} of (await import("../src/catalog/languages.mjs")).languageCatalog.uiLocales){
+    const {default:messages}=await import("../apps/web/messages/"+code.split("-")[0]+".mjs");
+    for(const room of expected.rooms) assert.ok(messages[room.experience]?.trim(),code+":"+room.id);
+  }
+});
