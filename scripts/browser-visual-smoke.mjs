@@ -58,6 +58,38 @@ async function checkLocale(page, locale) {
   assert.equal(await html.getAttribute("dir"), localeDirections.get(locale));
 }
 
+async function checkPreviewAccount(page) {
+  const account = page.getByRole("button", {name: /^EI\s+\S/});
+  assert.equal(await account.count(), 1, "The accessible account name must start with its visible label");
+  await account.focus();
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog");
+  assert.equal(await dialog.isVisible(), true);
+  await page.keyboard.press("Escape");
+  assert.equal(await dialog.isVisible(), false);
+  assert.equal(await account.evaluate((button) => document.activeElement === button), true);
+}
+
+async function checkLanguageMonogramContrast(page) {
+  const ratios = await page.locator(".language-monogram").evaluateAll((monograms) => {
+    const luminance = (rgb) => {
+      const channels = rgb.match(/\d+(?:\.\d+)?/g).slice(0, 3).map((value) => {
+        const channel = Number(value) / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    return monograms.map((monogram) => {
+      const style = getComputedStyle(monogram);
+      const text = luminance(style.color);
+      const background = luminance(style.backgroundColor);
+      return (Math.max(text, background) + 0.05) / (Math.min(text, background) + 0.05);
+    });
+  });
+  assert.equal(ratios.length, programs.length);
+  assert.ok(ratios.every((ratio) => ratio >= 4.5), `Language monogram contrast ratios: ${ratios.join(", ")}`);
+}
+
 async function checkProgram(page, code) {
   const filter = page.locator("#program-language");
   await filter.selectOption(code);
@@ -150,6 +182,8 @@ try {
   assert.equal(await desktop.locator(".language-card").count(), programs.length);
   assert.equal(await desktop.locator("html").getAttribute("lang"), "fa-IR");
   assert.equal(await desktop.locator("html").getAttribute("dir"),"rtl");
+  await checkLanguageMonogramContrast(desktop);
+  await checkPreviewAccount(desktop);
   await desktop.screenshot({path:"screenshots/campus-home-fa-desktop.png",fullPage:true,animations:"disabled"});
   for (const [view,asset] of [
     ["student","student-studio"],["teacher","teacher-atelier"],
@@ -160,6 +194,7 @@ try {
   assert.equal(await desktop.locator("#preview-dialog").evaluate((dialog) => dialog.open),true);
   await desktop.locator("#dialog-close").click();
   await checkLocale(desktop, "en-US");
+  await checkPreviewAccount(desktop);
   await desktop.locator(".section-title").first().waitFor();
   await desktop.screenshot({path:"screenshots/campus-teacher-en-desktop.png",fullPage:true,animations:"disabled"});
   const localeOptions = await desktop.locator("#ui-locale option").evaluateAll(
