@@ -7,7 +7,8 @@
 import assert from "node:assert/strict";
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 
 const base = "http://127.0.0.1:4173";
 const localeStorageKey = "elyora-institute.ui-locale";
@@ -41,12 +42,18 @@ async function checkRoom(page, view, expectedAsset) {
   await page.locator(".hero-image img").waitFor();
   const asset = await page.locator(".hero-image img").getAttribute("src");
   assert.equal(new URL(asset, page.url()).pathname, "/assets/" + expectedAsset + ".svg");
-  const width = await page.locator(".hero-image img").evaluate(async (img) => {
+  const record = await page.locator(".hero-image img").evaluate(async (img) => {
     await img.decode();
-    return img.naturalWidth;
+    return { width: img.naturalWidth, height: img.naturalHeight, label: img.alt.trim() };
   });
-  assert.ok(width > 100, "Missing image for " + view);
-  await page.screenshot({path:"screenshots/campus-" + view + "-fa-desktop.png",fullPage:true,animations:"disabled"});
+  assert.ok(record.width > 100 && record.height > 100, "Missing scene for " + view);
+  assert.ok(record.label, "Missing localized scene label for " + view);
+  const response = await page.request.get(new URL(asset, page.url()).href);
+  assert.ok(response.ok(), "Missing source file for " + view);
+  const sha256 = createHash("sha256").update(await response.body()).digest("hex");
+  const screenshot = "campus-" + view + "-fa-desktop.png";
+  await page.screenshot({path:"screenshots/" + screenshot,fullPage:true,animations:"disabled"});
+  return { workspace: view, file: expectedAsset + ".svg", ...record, sha256, screenshot };
 }
 
 async function checkLocale(page, locale) {
@@ -185,10 +192,15 @@ try {
   await checkLanguageMonogramContrast(desktop);
   await checkPreviewAccount(desktop);
   await desktop.screenshot({path:"screenshots/campus-home-fa-desktop.png",fullPage:true,animations:"disabled"});
+  const scenes = [];
   for (const [view,asset] of [
     ["student","student-studio"],["teacher","teacher-atelier"],
     ["classroom","live-classroom"],["command","command-center"]
-  ]) await checkRoom(desktop,view,asset);
+  ]) scenes.push(await checkRoom(desktop, view, asset));
+  assert.equal(new Set(scenes.map(scene => scene.sha256)).size, scenes.length, "Workspace artwork must be distinct");
+  await writeFile("screenshots/campus-scenes.json", JSON.stringify({
+    version: 1, interfaceLocale: "fa-IR", medium: "screen-preview", scenes
+  }, null, 2) + "\n");
   await desktop.locator('.nav-item[data-view="teacher"]').click();
   await desktop.locator('button[data-action="preview"]').first().click();
   assert.equal(await desktop.locator("#preview-dialog").evaluate((dialog) => dialog.open),true);

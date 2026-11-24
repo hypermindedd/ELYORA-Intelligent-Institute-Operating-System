@@ -23,3 +23,18 @@ These are original **first-party vector prototypes** made for this repo, visuall
 - Before replacing any scene: compare palette, warmth, materiality, spatial meaning, accessibility and all four workspace identities; record visual ADR and screenshot regression in Work/CI.
 - Future official logo/character/photo assets require verified rights, source/version and design approval.
 - Never turn a visual preview selector into role authorization.
+
+## Institute use of the Elyora visual baseline
+
+The existing Elyora Visual Baseline v1.0.0 governs educational illustrations and poster requests. The Institute workspace owns navigation, legibility, workspace identity and status presentation. Workspace accent colours apply to controls and headings within the shared campus palette. Campus previews reference first-party screen illustrations. Poster dimensions, print approval and learner outcomes have their own evidence.
+
+| Workspace | Purpose of its standalone scene | Control accent |
+| --- | --- | --- |
+| Student studio | Orient the learner to their private practice space | Emerald |
+| Teacher atelier | Locate private planning and assigned-learner work | Plum |
+| Live classroom | Recognize the shared class environment | Terracotta |
+| Institute command | Locate institutional operations | Ink |
+
+The browser evidence bundle includes one screenshot per room and a generated `campus-scenes.json`. Each record names the workspace and source file, records its content digest, decoded intrinsic dimensions and localized accessible label, and identifies the corresponding screenshot. Compare these records when artwork changes. Intrinsic SVG dimensions describe the screen prototype. Human review still determines educational purpose, composition and suitability.
+
+For an Institute-requested welcome or re-engagement poster, the future server integration should submit the educational purpose, target language, script and output medium through the official VisualIntent contract. Keep a learner's private notes out of the brief. The Visual Engine owns generation, review and approved asset records. Re-engagement observes opt-out. A print-ready export requires evidence from its delivered file. This integration remains planned.
