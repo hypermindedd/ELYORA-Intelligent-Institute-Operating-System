@@ -48,7 +48,10 @@
             <select id="ui-locale" data-i18n-label="uiLanguage" aria-label="زبان رابط"><option value="fa-IR" lang="fa-IR" dir="rtl">فارسی</option></select>
           </label>
           <span class="connection-status"><span class="connection-dot"></span><span data-i18n="offlineMode">نمایش آفلاین</span></span>
-          <button class="avatar" type="button" data-action="preview" data-i18n-label="previewAccount" aria-label="اطلاعات حساب نمایشی">EI</button>
+          <button class="avatar" type="button" data-action="preview" aria-labelledby="preview-account-mark preview-account-label">
+            <span id="preview-account-mark" lang="en" dir="ltr">EI</span>
+            <span id="preview-account-label" data-i18n="previewAccount" hidden>اطلاعات حساب نمایشی</span>
+          </button>
         </div>
       </header>
 

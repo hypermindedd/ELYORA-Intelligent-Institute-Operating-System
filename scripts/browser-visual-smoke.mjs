@@ -7,7 +7,8 @@
 import assert from "node:assert/strict";
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 
 const base = "http://127.0.0.1:4173";
 const localeStorageKey = "elyora-institute.ui-locale";
@@ -41,12 +42,18 @@ async function checkRoom(page, view, expectedAsset) {
   await page.locator(".hero-image img").waitFor();
   const asset = await page.locator(".hero-image img").getAttribute("src");
   assert.equal(new URL(asset, page.url()).pathname, "/assets/" + expectedAsset + ".svg");
-  const width = await page.locator(".hero-image img").evaluate(async (img) => {
+  const record = await page.locator(".hero-image img").evaluate(async (img) => {
     await img.decode();
-    return img.naturalWidth;
+    return { width: img.naturalWidth, height: img.naturalHeight, label: img.alt.trim() };
   });
-  assert.ok(width > 100, "Missing image for " + view);
-  await page.screenshot({path:"screenshots/campus-" + view + "-fa-desktop.png",fullPage:true,animations:"disabled"});
+  assert.ok(record.width > 100 && record.height > 100, "Missing scene for " + view);
+  assert.ok(record.label, "Missing localized scene label for " + view);
+  const response = await page.request.get(new URL(asset, page.url()).href);
+  assert.ok(response.ok(), "Missing source file for " + view);
+  const sha256 = createHash("sha256").update(await response.body()).digest("hex");
+  const screenshot = "campus-" + view + "-fa-desktop.png";
+  await page.screenshot({path:"screenshots/" + screenshot,fullPage:true,animations:"disabled"});
+  return { workspace: view, file: expectedAsset + ".svg", ...record, sha256, screenshot };
 }
 
 async function checkLocale(page, locale) {
@@ -56,6 +63,38 @@ async function checkLocale(page, locale) {
   assert.equal(await localeSelect.inputValue(), locale);
   assert.equal(await html.getAttribute("lang"), locale);
   assert.equal(await html.getAttribute("dir"), localeDirections.get(locale));
+}
+
+async function checkPreviewAccount(page) {
+  const account = page.getByRole("button", {name: /^EI\s+\S/});
+  assert.equal(await account.count(), 1, "The accessible account name must start with its visible label");
+  await account.focus();
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog");
+  assert.equal(await dialog.isVisible(), true);
+  await page.keyboard.press("Escape");
+  assert.equal(await dialog.isVisible(), false);
+  assert.equal(await account.evaluate((button) => document.activeElement === button), true);
+}
+
+async function checkLanguageMonogramContrast(page) {
+  const ratios = await page.locator(".language-monogram").evaluateAll((monograms) => {
+    const luminance = (rgb) => {
+      const channels = rgb.match(/\d+(?:\.\d+)?/g).slice(0, 3).map((value) => {
+        const channel = Number(value) / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    return monograms.map((monogram) => {
+      const style = getComputedStyle(monogram);
+      const text = luminance(style.color);
+      const background = luminance(style.backgroundColor);
+      return (Math.max(text, background) + 0.05) / (Math.min(text, background) + 0.05);
+    });
+  });
+  assert.equal(ratios.length, programs.length);
+  assert.ok(ratios.every((ratio) => ratio >= 4.5), `Language monogram contrast ratios: ${ratios.join(", ")}`);
 }
 
 async function checkProgram(page, code) {
@@ -85,7 +124,7 @@ async function checkCjkFonts(page) {
     await session.send("DOM.enable");
     await session.send("CSS.enable");
     const {root} = await session.send("DOM.getDocument");
-    for (const selector of ["h1", '.language-card[data-program="zh-Hans"] bdi', '.language-card[data-program="ja"] bdi']) {
+    for (const selector of ["h1", '.language-card[data-program="zh-Hans"] strong bdi', '.language-card[data-program="ja"] strong bdi']) {
       const {nodeId} = await session.send("DOM.querySelector", {nodeId: root.nodeId, selector});
       const {fonts} = await session.send("CSS.getPlatformFontsForNode", {nodeId});
       const content = await page.locator(selector).textContent();
@@ -150,16 +189,49 @@ try {
   assert.equal(await desktop.locator(".language-card").count(), programs.length);
   assert.equal(await desktop.locator("html").getAttribute("lang"), "fa-IR");
   assert.equal(await desktop.locator("html").getAttribute("dir"),"rtl");
+  await checkLanguageMonogramContrast(desktop);
+  await checkPreviewAccount(desktop);
   await desktop.screenshot({path:"screenshots/campus-home-fa-desktop.png",fullPage:true,animations:"disabled"});
+  await desktop.locator('.nav-item[data-view="student"]').click();
+  const studio = desktop.locator('[data-room="story-studio"]');
+  await studio.locator(":scope > summary").click();
+  const french = studio.locator(".room-story").first();
+  await french.locator(":scope > summary").click();
+  const choice = french.locator("details").first();
+  await choice.locator(":scope > summary").click();
+  assert.ok(await choice.locator(":scope > p").isVisible());
+  const retry = choice.locator("details");
+  await retry.locator("summary").click();
+  assert.ok(await retry.locator("p").isVisible());
+  await studio.screenshot({path:"screenshots/room-story-choice.png"});
+  await desktop.locator('.nav-item[data-view="teacher"]').click();
+  const workshop = desktop.locator('[data-room="tomorrows-class"]');
+  await workshop.locator("summary").click();
+  await workshop.locator("textarea").fill("private-local-sample");
+  await checkLocale(desktop, "en-US");
+  assert.equal(await workshop.locator("textarea").inputValue(),"private-local-sample");
+  await desktop.locator('.nav-item[data-view="command"]').click();
+  assert.ok(!(await desktop.locator("#main").innerText()).includes("private-local-sample"));
+  await desktop.locator('.nav-item[data-view="teacher"]').click();
+  assert.equal(await workshop.locator("textarea").inputValue(),"");
+  await desktop.locator('.nav-item[data-view="classroom"]').click();
+  assert.equal(await desktop.locator('[data-room="discussion-circle"] button').count(),0);
+  await checkLocale(desktop,"fa-IR");
+  const scenes = [];
   for (const [view,asset] of [
     ["student","student-studio"],["teacher","teacher-atelier"],
     ["classroom","live-classroom"],["command","command-center"]
-  ]) await checkRoom(desktop,view,asset);
+  ]) scenes.push(await checkRoom(desktop, view, asset));
+  assert.equal(new Set(scenes.map(scene => scene.sha256)).size, scenes.length, "Workspace artwork must be distinct");
+  await writeFile("screenshots/campus-scenes.json", JSON.stringify({
+    version: 1, interfaceLocale: "fa-IR", medium: "screen-preview", scenes
+  }, null, 2) + "\n");
   await desktop.locator('.nav-item[data-view="teacher"]').click();
   await desktop.locator('button[data-action="preview"]').first().click();
   assert.equal(await desktop.locator("#preview-dialog").evaluate((dialog) => dialog.open),true);
   await desktop.locator("#dialog-close").click();
   await checkLocale(desktop, "en-US");
+  await checkPreviewAccount(desktop);
   await desktop.locator(".section-title").first().waitFor();
   await desktop.screenshot({path:"screenshots/campus-teacher-en-desktop.png",fullPage:true,animations:"disabled"});
   const localeOptions = await desktop.locator("#ui-locale option").evaluateAll(
@@ -172,6 +244,14 @@ try {
   }
 
   await checkProgram(desktop, "ar");
+  const passport = desktop.locator(".program-passport");
+  await passport.locator("summary").focus();
+  await desktop.keyboard.press("Enter");
+  assert.equal(await passport.evaluate(node => node.open), true);
+  assert.deepEqual(await passport.locator("li bdi").allTextContents(), ["ar-SA", "ar-EG", "ar-MA"]);
+  assert.equal(await desktop.locator("#ui-locale").inputValue(), "en-US");
+  await passport.screenshot({path:"screenshots/program-profile-ar-en.png"});
+
   const textBySurface = {
     title: new Set(), description: new Set(), hero: new Set(), catalog: new Set(),
     dialog: new Set(), navigationLabel: new Set(),

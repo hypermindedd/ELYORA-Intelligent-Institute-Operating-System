@@ -8,6 +8,24 @@ export const languageCatalog = Object.freeze(JSON.parse(
 const BCP47 = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;
 const RTL_SCRIPTS = new Set(["Arab", "Hebr", "Syrc", "Thaa", "Nkoo", "Adlm"]);
 
+// Each program lists canonical variants belonging to its target language.
+function validProgramVariants(entry) {
+  const tags = entry.plannedLocaleVariants;
+  if (new Set(tags).size !== tags.length) return false;
+  try {
+    const program = new Intl.Locale(entry.code);
+    return tags.every((tag) => {
+      if (typeof tag !== "string" || !BCP47.test(tag)) return false;
+      const locale = new Intl.Locale(tag);
+      if (locale.toString() !== tag || locale.language !== program.language) return false;
+      // An explicitly script-scoped program can only advertise matching variants.
+      return !program.script || locale.maximize().script === program.script;
+    });
+  } catch {
+    return false;
+  }
+}
+
 export function validateLanguageCatalog(catalog = languageCatalog) {
   const errors = [];
   if (!catalog || catalog.schemaVersion !== 1 || !Array.isArray(catalog.languages)) {
@@ -29,10 +47,11 @@ export function validateLanguageCatalog(catalog = languageCatalog) {
       } catch { errors.push("INVALID_BCP47_CODE:" + entry.code); }
     }
     if (!entry.autonym || !entry.displayNameFa || !entry.displayNameEn || !entry.script) errors.push("MISSING_LANGUAGE_DISPLAY_METADATA");
+    if (!/^[A-Z][a-z]{3}$/.test(entry.script)) errors.push("INVALID_SCRIPT");
     if (!["ltr", "rtl"].includes(entry.direction)) errors.push("INVALID_DIRECTION");
     if (RTL_SCRIPTS.has(entry.script) && entry.direction !== "rtl") errors.push("RTL_SCRIPT_DIRECTION_MISMATCH");
     if (!Array.isArray(entry.plannedLocaleVariants) || entry.plannedLocaleVariants.length === 0) errors.push("MISSING_PLANNED_VARIANTS");
-    else if (entry.plannedLocaleVariants.some((v) => !BCP47.test(v))) errors.push("INVALID_VARIANT");
+    else if (!validProgramVariants(entry)) errors.push("INVALID_VARIANT");
     if (entry.program?.status !== "PLANNED") errors.push("PROGRAM_MUST_BE_PLANNED");
     if (!entry.capabilities || Object.values(entry.capabilities).some((v) => !["NOT_CONNECTED","NOT_VERIFIED","PLANNED"].includes(v))) {
       errors.push("CAPABILITY_MUST_NOT_CLAIM_UNVERIFIED_SUPPORT");

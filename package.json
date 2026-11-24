@@ -9,6 +9,8 @@
   "scripts": {
     "test": "node --test",
     "check": "node scripts/validate-contracts.mjs && node scripts/validate-engine-registry.mjs && npm test",
+    "demo:live": "node examples/live-audio/server.mjs",
+    "demo:teacher": "node examples/teacher-rehearsal.mjs",
     "demo": "node examples/vertical-slice.mjs",
     "web": "node apps/web/server.mjs",
     "test:campus": "node --test tests/campus-preview.test.mjs",

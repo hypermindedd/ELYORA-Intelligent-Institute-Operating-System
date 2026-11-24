@@ -100,10 +100,10 @@ nav{display:flex;flex-direction:column;gap:7px}
 .language-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .language-card{flex-wrap:wrap;border:1px solid var(--line);background:#fff;border-radius:18px;padding:15px;display:flex;align-items:center;gap:11px;min-width:0}
 .language-card:hover{border-color:#aee7df}
-.language-monogram{flex:0 0 44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#e1f8f4;color:#168277;font-size:17px;font-weight:900}
-.language-card:nth-child(4n+2) .language-monogram{background:#fff0db;color:#b5682a}
-.language-card:nth-child(4n+3) .language-monogram{background:#ffece9;color:#c85d50}
-.language-card:nth-child(4n+4) .language-monogram{background:#fff7ce;color:#ac8133}
+.language-monogram{flex:0 0 44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#e1f8f4;color:var(--tiffany-dark);font-size:17px;font-weight:900}
+.language-card:nth-child(4n+2) .language-monogram{background:#fff0db;color:#92501f}
+.language-card:nth-child(4n+3) .language-monogram{background:#ffece9;color:#9e4038}
+.language-card:nth-child(4n+4) .language-monogram{background:#fff7ce;color:#7d5b1e}
 .language-body{min-width:0;flex:1 1 75px}
 .language-body strong{font-size:13px;display:block;overflow-wrap:anywhere}
 .language-body small{display:block;overflow-wrap:anywhere;color:var(--muted);font-size:11px}
@@ -116,7 +116,7 @@ nav{display:flex;flex-direction:column;gap:7px}
 .feature-card h3{font-size:14px;margin:4px 0}
 .feature-card p{font-size:12px;line-height:1.9;color:var(--muted);margin:0}
 .notice-strip{display:flex;align-items:flex-start;gap:11px;border:1px solid #e5eadf;background:#f5fbef;border-radius:14px;padding:12px 17px;margin-top:27px;color:#587066;font-size:11px}
-.notice-strip strong{font-size:14px;color:#4a8a72}
+.notice-strip strong{font-size:14px;color:var(--tiffany-dark)}
 .site-footer{padding:15px clamp(18px,3.4vw,54px) 19px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;font-size:10px;color:#6b6257}
 dialog{max-width:min(420px,calc(100vw - 36px));border:1px solid #f1dacc;border-radius:22px;padding:28px 31px;background:#fffdf9;box-shadow:var(--shadow);color:var(--ink)}
 dialog::backdrop{background:rgba(35,43,42,.45)}
@@ -177,3 +177,59 @@ html:lang(ko) :is(.hero-copy h1,.section-title,.space-card h3){word-break:keep-a
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+/* Workspace accents complement the original warm campus scenes. */
+.hero {
+  --workspace-ink: #0c514c;
+  --workspace-paper: #e6f5ec;
+  --workspace-metal: #d4ad60;
+  background: linear-gradient(125deg, var(--workspace-paper), var(--ivory) 66%);
+  border-block-start: 4px solid var(--workspace-metal);
+}
+.hero[data-workspace="teacher"] {
+  --workspace-ink: #513866;
+  --workspace-paper: #f0e9f3;
+  --workspace-metal: #ab853f;
+}
+.hero[data-workspace="classroom"] {
+  --workspace-ink: #863e31;
+  --workspace-paper: #faebe0;
+  --workspace-metal: #b7694d;
+}
+.hero[data-workspace="command"] {
+  --workspace-ink: #293f58;
+  --workspace-paper: #e8eff0;
+  --workspace-metal: #ae8e52;
+}
+.hero .eyebrow, .hero-copy h1 em { color: var(--workspace-ink); }
+.hero .button-primary { background: var(--workspace-ink); color: white; box-shadow: none; }
+.hero .eyebrow::before { background: var(--workspace-metal); }
+.program-passport {
+  flex: 1 0 100%;
+  min-inline-size: 0;
+  border-block-start: 1px solid var(--line);
+  color: var(--text);
+  font-size: .83rem;
+}
+.program-passport summary {
+  color: var(--tiffany-dark);
+  padding-block: .65rem;
+  cursor: pointer;
+  font-weight: 750;
+}
+.program-passport summary:focus-visible { outline: 3px solid #a33d36; outline-offset: 2px; }
+.program-passport dl { margin: 0; }
+.program-passport dt { color: var(--muted); font-size: .76rem; }
+.program-passport dd { margin: 0 0 .6rem; overflow-wrap: anywhere; }
+.program-passport ul { list-style: none; padding: 0; margin: 0; }
+.program-passport bdi { font-size: .73rem; color: var(--muted); }
+
+.room-directory { margin-block: 2rem; }
+.room-directory h2 { color:var(--text); margin-block-end: .65rem; }
+.room-entry { background: var(--ivory); border: 1px solid var(--line); border-radius: 14px; padding: .9rem 1.1rem; margin-block: .5rem; overflow-wrap: anywhere; }
+.room-entry h3, .room-entry p { margin-block: .3em; }
+.room-entry summary { cursor: pointer; padding-block: .35rem; font-weight: 700; }
+.room-entry summary:focus-visible, .room-entry textarea:focus-visible { outline: 3px solid #12645e; outline-offset: 2px; }
+.room-entry textarea { display: block; width:100%; margin-block: .5rem; font:inherit; color:inherit; padding:.5rem; }
+.room-story { margin-block:.5rem; border-block-start:1px solid var(--line); }
+.room-story details { margin-inline:1rem; }
