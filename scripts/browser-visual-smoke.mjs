@@ -117,7 +117,7 @@ async function checkCjkFonts(page) {
     await session.send("DOM.enable");
     await session.send("CSS.enable");
     const {root} = await session.send("DOM.getDocument");
-    for (const selector of ["h1", '.language-card[data-program="zh-Hans"] bdi', '.language-card[data-program="ja"] bdi']) {
+    for (const selector of ["h1", '.language-card[data-program="zh-Hans"] strong bdi', '.language-card[data-program="ja"] strong bdi']) {
       const {nodeId} = await session.send("DOM.querySelector", {nodeId: root.nodeId, selector});
       const {fonts} = await session.send("CSS.getPlatformFontsForNode", {nodeId});
       const content = await page.locator(selector).textContent();
