@@ -1,4 +1,6 @@
 # Reference architecture — A1 proposal
+
+For module ownership, the connected slice, recovery, and the release sequence, see the [governed Institute blueprint](GOVERNED_INSTITUTE_BLUEPRINT_FA.md) and [ADR-EI-014](../adr/ADR-EI-014.md).
 **Recommendation:** modular monolith for organizational domains initially, strict domain boundaries, one durable transactional store per organization boundary, transactional outbox, separate background workers/media provider, and provider-neutral ELYORA integration. Physical microservices are not an atomicity requirement.
 
 ```text
