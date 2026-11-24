@@ -23,5 +23,16 @@ try {
     await page.locator('[data-status="left"]').waitFor();
     assert.equal(await page.locator("#remote").evaluate(el=>el.srcObject),null);
   }
+  await guest.evaluate(() => {
+    navigator.mediaDevices.getUserMedia = () => { throw Error("Listen-only must not request a microphone"); };
+  });
+  await guest.locator("#listen").click();
+  await host.locator("#join").click();
+  await guest.locator('[data-status="connected"]').waitFor();
+  await guest.waitForFunction(()=>document.querySelector("audio").currentTime > 0.2);
+  assert.ok(await guest.locator("#mute").isDisabled());
+  await host.locator("#leave").click();
+  await guest.locator('[data-status="left"]').waitFor();
+  console.log("PASS voluntary listen-only guest with no microphone request");
   console.log("PASS two local browser tabs, bidirectional synthetic audio, mute control and teardown");
 } finally { await browser?.close(); server.kill(); }

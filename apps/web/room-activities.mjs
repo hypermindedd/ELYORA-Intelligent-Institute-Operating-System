@@ -3,14 +3,16 @@ import catalog from "./room-directory.mjs";
 
 const stories = [
   {lang:"fr", title:"Le billet de train", scene:"À la gare, Léa trouve un billet pour Lyon sur le banc. Le train part dans cinq minutes.",
+    retryLabel:"Un indice, puis un nouvel essai",
     paths:[
-      ["Interroger un voyageur", "Le voyageur a perdu un billet pour Lille. Quelles questions permettent de vérifier la destination sans lui montrer le billet ?"],
-      ["Aller au guichet", "L’agente demande où le billet a été trouvé. Racontez la scène, puis proposez une annonce sans donner le nom du voyageur."]
+      ["Interroger un voyageur", "Le voyageur a perdu un billet pour Lille. Quelles questions permettent de vérifier la destination sans lui montrer le billet ?", "Demandez où et à quelle heure il doit partir. Un autre voyageur arrive : vérifiez son trajet avec vos propres mots."],
+      ["Aller au guichet", "L’agente demande où le billet a été trouvé. Racontez la scène, puis proposez une annonce sans donner le nom du voyageur.", "Précisez le lieu et l’heure. Cette fois, vous avez trouvé un sac à la bibliothèque : comment le signalez-vous ?"]
     ]},
   {lang:"en", title:"The last rehearsal", scene:"The school concert starts in ten minutes. A new student has the music but cannot find the rehearsal room.",
+    retryLabel:"A hint and a fresh try",
     paths:[
-      ["Give directions", "The usual corridor is closed. Describe another route using two landmarks, then check that the student can repeat it."],
-      ["Ask a musician", "The musician is in a hurry. Ask for help politely, then explain the plan to the new student in your own words."]
+      ["Give directions", "The usual corridor is closed. Describe another route using two landmarks, then check that the student can repeat it.", "Try one landmark at a time. Now the lift is closed too. Give the new route and invite the student to check it."],
+      ["Ask a musician", "The musician is in a hurry. Ask for help politely, then explain the plan to the new student in your own words.", "Give the musician an easy way to decline. Now ask a busy stage manager for directions instead."]
     ]}
 ];
 
@@ -18,7 +20,8 @@ function storyStudio(t, escape) {
   return '<p>'+escape(t("chooseStory"))+'</p>'+stories.map(story =>
     '<details class="room-story"><summary lang="'+story.lang+'" dir="ltr">'+escape(story.title)+'</summary>'+
     '<p lang="'+story.lang+'" dir="ltr">'+escape(story.scene)+'</p><p>'+escape(t("storyTry"))+'</p>'+
-    story.paths.map(([title,prompt]) => '<details lang="'+story.lang+'" dir="ltr"><summary>'+escape(title)+'</summary><p>'+escape(prompt)+'</p></details>').join("")+'</details>'
+    story.paths.map(([title,prompt,retry]) => '<details lang="'+story.lang+'" dir="ltr"><summary>'+escape(title)+'</summary><p>'+escape(prompt)+'</p>'+
+      '<details><summary>'+escape(story.retryLabel)+'</summary><p>'+escape(retry)+'</p></details></details>').join("")+'</details>'
   ).join("");
 }
 export function roomDirectory(view,t,escape) {

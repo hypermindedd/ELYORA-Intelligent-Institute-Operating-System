@@ -198,8 +198,12 @@ try {
   const french = studio.locator(".room-story").first();
   await french.locator(":scope > summary").click();
   const choice = french.locator("details").first();
-  await choice.locator("summary").click();
-  assert.ok(await choice.locator("p").isVisible());
+  await choice.locator(":scope > summary").click();
+  assert.ok(await choice.locator(":scope > p").isVisible());
+  const retry = choice.locator("details");
+  await retry.locator("summary").click();
+  assert.ok(await retry.locator("p").isVisible());
+  await studio.screenshot({path:"screenshots/room-story-choice.png"});
   await desktop.locator('.nav-item[data-view="teacher"]').click();
   const workshop = desktop.locator('[data-room="tomorrows-class"]');
   await workshop.locator("summary").click();

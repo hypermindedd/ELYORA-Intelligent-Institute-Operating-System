@@ -6,9 +6,10 @@ const room = host ? crypto.randomUUID() : key;
 if (!/^[a-f0-9-]{36}$/i.test(room)) throw Error("Invalid local invitation");
 const bus = new BroadcastChannel("elyora-local-audio-" + room);
 const self = crypto.randomUUID();
-let partner, media, peer, joining = false, generation = 0;
+let partner, media, peer, inRoom = false, joining = false, generation = 0;
 const tell = (type, data = null) => bus.postMessage({ type, from:self, to:partner, data });
 const status = (code, label) => { $("state").dataset.status=code; $("state").textContent=label; };
+$("listen").hidden=host;
 if (host) { $("guest").href = "/#" + room; $("guest").hidden = false; }
 
 function reset(notify = true) {
@@ -16,8 +17,8 @@ function reset(notify = true) {
   if (notify && partner) tell("leave");
   if (peer) { peer.onconnectionstatechange=null; peer.close(); }
   for (const track of media?.getTracks() ?? []) track.stop();
-  peer=null; media=null; partner=null; joining=false;
-  $("remote").srcObject=null; $("join").disabled=false; $("leave").disabled=true; $("mute").disabled=true;
+  peer=null; media=null; partner=null; inRoom=false; joining=false;
+  $("listen").disabled=false; $("remote").srcObject=null; $("join").disabled=false; $("leave").disabled=true; $("mute").disabled=true;
   $("mute").setAttribute("aria-pressed","false");
   status("left","مکالمه پایان یافت. می‌توانید دوباره وارد شوید.");
 }
@@ -43,7 +44,8 @@ async function describe(connection, description) {
 function connect() {
   const connection = new RTCPeerConnection({iceServers:[]});
   peer=connection;
-  for (const track of media.getAudioTracks()) connection.addTrack(track,media);
+  if (media) for (const track of media.getAudioTracks()) connection.addTrack(track,media);
+  else connection.addTransceiver("audio",{direction:"recvonly"});
   connection.ontrack = event => { $("remote").srcObject=event.streams[0]; };
   connection.onconnectionstatechange = () => {
     if (connection.connectionState === "connected") status("connected","صدا وصل شد.");
@@ -53,7 +55,7 @@ function connect() {
 }
 
 bus.onmessage = async ({data:msg}) => {
-  if (!media || (msg.to && msg.to !== self) || (partner && partner !== msg.from)) return;
+  if (!inRoom || (msg.to && msg.to !== self) || (partner && partner !== msg.from)) return;
   const current=generation;
   try {
     if (msg.type === "ready" && host && !peer) {
@@ -73,19 +75,21 @@ bus.onmessage = async ({data:msg}) => {
   } catch { if (generation===current) { reset(); status("error","اتصال برقرار نشد. دوباره امتحان کنید."); } }
 };
 
-$("join").onclick=async () => {
-  if (media || joining) return;
+async function join(withMicrophone) {
+  if (inRoom || joining) return;
   joining=true;
   const current=++generation;
-  $("join").disabled=true; $("leave").disabled=false;
+  $("join").disabled=true; $("listen").disabled=true; $("leave").disabled=false;
   try {
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-    if (generation!==current) { stream.getTracks().forEach(t=>t.stop()); return; }
-    media=stream; joining=false; $("mute").disabled=false;
+    const stream=withMicrophone ? await navigator.mediaDevices.getUserMedia({audio:true,video:false}) : null;
+    if (generation!==current) { stream?.getTracks().forEach(t=>t.stop()); return; }
+    media=stream; inRoom=true; joining=false; $("mute").disabled=!withMicrophone;
     status("waiting","منتظر همراه…");
     tell(host ? "waiting" : "ready");
   } catch { if (generation===current) { reset(); status("unavailable","میکروفن در دسترس نیست. اجازهٔ مرورگر و دستگاه را بررسی کنید."); } }
-};
+}
+$("join").onclick=()=>join(true);
+$("listen").onclick=()=>join(false);
 $("mute").onclick=() => {
   if (!media) return;
   const muted=$("mute").getAttribute("aria-pressed")!=="true";
