@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { authorizeTenantManager } from "./policy.mjs";
+import { matchTeacherChallenge, teacherChallenge } from "./teacher-challenge.mjs";
 
 const rubric = JSON.parse(readFileSync(new URL("../../packages/teacher-qualification/rehearsal.v1.json", import.meta.url), "utf8"));
 const hasText = value => typeof value === "string" && value.trim().length > 0;
@@ -94,7 +95,7 @@ export function createTeacherRehearsal({ tenantId, teacherId, reviewerId, manage
 export const rehearsalAnchors = Object.freeze({ ...rubric.anchors });
 
 // An owner-only practice object has no personnel case, release or management projection.
-// Private replies stay with the teacher. Only the authored learner prompts enter this model.
+// Private replies are processed in memory and are never retained by the workshop.
 export function openPrivateWorkshop({ owner, variety, taskId }) {
   if (owner?.role !== "teacher" || owner.serverAuthenticated !== true ||
       !hasText(owner.actorId) || !hasText(owner.tenantId)) throw Error("TEACHER_DENIED");
@@ -103,6 +104,8 @@ export function openPrivateWorkshop({ owner, variety, taskId }) {
   if (!task) throw Error("UNKNOWN_TASK");
   const ownerId = owner.actorId, tenantId = owner.tenantId;
   const [opening, clarification, transfer] = rubric.packs[variety][taskId];
+  let activeChallenge = null;
+  const challengeRounds = new Map();
   function checkOwner(actor) {
     if (actor?.serverAuthenticated !== true || actor.role !== "teacher" ||
         actor.actorId !== ownerId || actor.tenantId !== tenantId) throw Error("PRIVATE_WORKSHOP_DENIED");
@@ -113,6 +116,29 @@ export function openPrivateWorkshop({ owner, variety, taskId }) {
       const lines = { opening, clarification, transfer };
       if (!Object.hasOwn(lines, step)) throw Error("UNKNOWN_STEP");
       return lines[step];
+    },
+    challengeTurn(actor, reply) {
+      checkOwner(actor);
+      if (variety !== "en-GB" || typeof reply !== "string" || reply.length > 2000) return null;
+      if (!reply.trim()) {
+        activeChallenge = null;
+        return null;
+      }
+      const signal = matchTeacherChallenge(taskId, reply);
+      if (signal?.kind === "regular") {
+        activeChallenge = null;
+        return { kind: "regular" };
+      }
+      if (activeChallenge && (!signal || signal.reason)) {
+        const { coaching, retry, why } = activeChallenge;
+        activeChallenge = null;
+        return { kind: "coaching", coaching, retry, ...(why ? { why } : {}) };
+      }
+      if (signal?.kind !== "challenge") return null;
+      const round = challengeRounds.get(signal.taskId) ?? 0;
+      activeChallenge = teacherChallenge(signal, round);
+      challengeRounds.set(signal.taskId, round + 1);
+      return { kind: "challenge", prompt: activeChallenge.prompt };
     }
   };
 }

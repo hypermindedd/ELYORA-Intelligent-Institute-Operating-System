@@ -34,7 +34,15 @@ async function run() {
     let step = "opening";
     while (step !== "finish") {
       console.log(workshop.prompt(owner, step));
-      await ask("Try an explanation privately, then press Enter. Your answer is not saved.");
+      const reply = await ask("Try an explanation or ask for a more demanding example. Your answer is not saved.");
+      let next = workshop.challengeTurn(owner, reply);
+      while (next?.kind === "challenge") {
+        next = workshop.challengeTurn(owner, await ask(next.prompt));
+      }
+      if (next?.kind === "coaching") {
+        if (next.why) console.log(`${next.why} I adapt the example and pace to what you show me as we work.`);
+        await ask(`${next.coaching}\nTry a new example: ${next.retry}`);
+      }
       step = await choose("Choose clarification, transfer, opening to retry, or finish.", ["clarification", "transfer", "opening", "finish"]);
     }
     return;
