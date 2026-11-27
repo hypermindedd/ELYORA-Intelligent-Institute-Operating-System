@@ -1,0 +1,113 @@
+{
+  "version": "I10-challenge-en-GB-2",
+  "contexts": {
+    "work": ["Picture a coaching session at work.", "Imagine an English lesson for a team working across cultures.", "Picture a teacher-training session for workplace English."],
+    "practice": ["Let's try a fresh example.", "Imagine this comes up in a conversation class.", "Let's switch to a one-to-one lesson."]
+  },
+  "scenarios": {
+    "meaning": [
+      {
+        "prompt": "I’m your learner. Someone replies ‘I’ll bear that in mind’ after hearing a proposal. Have they agreed to it? Show me how you would distinguish interest from a polite refusal.",
+        "coaching": "The phrase promises consideration at most. Tone and the surrounding turns can suggest interest or polite distance. A useful check is ‘Would you like me to send you a concrete option?’",
+        "retry": "A colleague says ‘That’s one way to look at it.’ Give two likely readings and suggest a neutral follow-up."
+      },
+      {
+        "prompt": "A listener hears ‘I only asked Mia to review the introduction.’ Give two readings that a speaker could make clear with stress or rephrasing.",
+        "coaching": "One reading limits what the speaker did to asking, while another limits the material under review to the introduction. Rephrasing can resolve this independently of the speaker’s accent.",
+        "retry": "Rewrite ‘I just told Sara about the delay’ in two ways that make the intended meaning explicit."
+      }
+    ],
+    "rule": [
+      {
+        "prompt": "I’m your learner. You said ‘could’ describes ability. In ‘You could ask Maya before you decide’, I assumed the person couldn’t ask Maya now. How would you show me what ‘could’ is doing here?",
+        "coaching": "Here ‘could’ offers a current option. Compare ‘I could swim at six’ (past ability) with ‘You could call first’ (a present suggestion). Point to the context rather than assigning one meaning to the word.",
+        "retry": "Give me a new pair with ‘might’, where one invites a possible action and the other expresses uncertainty."
+      },
+      {
+        "prompt": "I’m your learner. I was told a reported question always shifts tense. You say ‘Rosa asked where Ben lives.’ I expected ‘lived.’ What difference could either version make?",
+        "coaching": "Backshift is common after a past reporting verb. ‘Lives’ can keep the current fact in view when it still applies. ‘Lived’ can be ordinary backshift and does not by itself prove that Ben moved.",
+        "retry": "Give two retellings of a question about someone’s job, then ask your learner what each lets them assume."
+      }
+    ],
+    "register": [
+      {
+        "prompt": "I’m your learner. A colleague says ‘I’m absolutely gutted, but let’s crack on.’ What does each expression convey, and how would I say it in a client update without flattening the emotion?",
+        "coaching": "‘Gutted’ is very informal British English for deeply disappointed. ‘Crack on’ means get on with the work. ‘I’m really disappointed by the result, but let’s keep going’ preserves both ideas in a less informal register.",
+        "retry": "Give two versions of ‘That was a bit of a faff’, one for a close colleague and another for someone you have just met."
+      },
+      {
+        "prompt": "A friend says ‘Fair play, you pulled it off.’ Show me what this expresses beyond ‘You succeeded’, then adapt it to a brief written review.",
+        "coaching": "‘Fair play’ here acknowledges or credits someone. ‘Pulled it off’ suggests succeeding at something difficult. ‘You deserve credit for delivering this under pressure’ can express both in a review.",
+        "retry": "Translate ‘I’ll give you that’ into two spoken replies, one showing genuine agreement and one conceding only a limited point."
+      }
+    ],
+    "proverb": [
+      {
+        "prompt": "A person says ‘The proof is in the pudding’ during a pilot. What would count as proof in that situation? Respond without using an idiom.",
+        "coaching": "They are pushing for results from real use. Name an observable outcome, then explain what result would change their mind.",
+        "retry": "Use ‘A stitch in time saves nine’ in one appropriate situation and explain where it would be unhelpful."
+      },
+      {
+        "prompt": "I’m your learner. When I hear ‘A rolling stone gathers no moss’, how do I tell whether the speaker admires moving around or disapproves of it?",
+        "coaching": "Both readings are possible because ‘moss’ can suggest stagnation or anything that accumulates over time. The speaker’s evaluation and the wider context matter.",
+        "retry": "Explain one saying whose tone can change with the situation and give two short settings."
+      }
+    ],
+    "class": [
+      {
+        "prompt": "I’m your learner. I say ‘bath’ with the shorter vowel and my classmate uses the longer vowel. I can understand both. Which, if either, should I change for a clear explanation to a class?",
+        "coaching": "Both are used in British English. Teach intelligibility and the learner’s chosen variety. Correct a pronunciation when it causes misunderstanding or when the learner explicitly wants a particular model.",
+        "retry": "A learner understands a regional variant but wants a consistent model for reading a recording script. How would you help them choose?"
+      },
+      {
+        "prompt": "I’m your learner. In ‘I asked for fifteen tickets’, I heard ‘fifty’. How would you help me hear and produce that contrast without criticising my accent?",
+        "coaching": "Check the words in a meaningful sentence, then practise notes such as ‘one five’ for disambiguation. Stress patterns in careful production can support recognition. The outcome is whether a listener reliably gets the intended number.",
+        "retry": "Invent a role-play with thirteen and thirty and phrase a quick comprehension check."
+      }
+    ],
+    "listening": [
+      {
+        "prompt": "Use this written script to prepare a fast listening exercise: ‘I’d have brought it up, but we were already running over, and it turned out Maya had sorted it anyway.’ Separate what the speaker considered doing from what happened.",
+        "coaching": "The speaker considered raising the issue but didn’t. The meeting was running late and Maya had already dealt with it. In audio, track the contrast after ‘but’ and the resolution after ‘turned out’.",
+        "retry": "Retell it in two short sentences, keeping the order of events clear."
+      },
+      {
+        "prompt": "Use this written script to prepare a fast listening exercise: ‘We thought we’d have to start over, only to find the original was still in the shared folder.’ What earlier assumption did the speaker revise?",
+        "coaching": "They expected to redo the work. ‘Only to find’ introduces a discovery that overturns that expectation. Practise finding the assumption and the discovery as separate listening targets.",
+        "retry": "Give a new two-clause example where the discovery changes the plan, then ask a listener what actually happened."
+      }
+    ]
+  },
+  "tasks": {
+    "meaning": {
+      "prompt": "A colleague says, ‘I wouldn’t say the rollout went entirely to plan.’ What are they communicating indirectly? Give a direct version and an equally tactful one.",
+      "coaching": "The hedge allows the speaker to signal that something went wrong without making a blunt accusation. Compare ‘We missed several milestones’ with ‘There were a few bumps along the way.’ Neither version tells us how serious the problems were without more context.",
+      "retry": "A colleague calls a proposal ‘ambitious.’ Give two plausible interpretations and ask one short question that would help you tell them apart."
+    },
+    "rule": {
+      "prompt": "A student says ‘If you would just bear with me, I can explain’ violates the rule against ‘would’ after ‘if’. Explain the exception and contrast it with an ordinary hypothetical.",
+      "coaching": "Here ‘would’ asks for willingness, so the opening functions as a polite appeal. Compare it with ‘If I had more time, I would explain,’ where the if-clause imagines a different situation.",
+      "retry": "Give a learner two new sentences: one with ‘would’ to ask for cooperation, and one with an ordinary hypothetical. Ask them to explain the difference."
+    },
+    "register": {
+      "prompt": "Your colleague texts, ‘I’m knackered. Can we call it a day?’ Explain both expressions to a learner, then convey the same message to a new client without sounding stiff.",
+      "coaching": "‘Knackered’ is very informal British English for very tired or exhausted. ‘Call it a day’ means stop working for now. A client-friendly version is ‘Could we wrap up here and pick this up tomorrow?’ The useful distinction is audience and register.",
+      "retry": "Use the same informal-versus-client distinction to postpone a meeting because you have had a hectic morning."
+    },
+    "proverb": {
+      "prompt": "In a project meeting someone says ‘We’re putting the cart before the horse.’ What order of decisions are they questioning? Rewrite the comment for a colleague who has never heard the idiom.",
+      "coaching": "The idiom criticises doing things in the wrong order. It is more useful to name the dependency: ‘We should agree what success looks like before choosing the software.’",
+      "retry": "Give an example where this idiom is apt and one where the problem is insufficient resources instead of the order of work."
+    },
+    "class": {
+      "prompt": "A confident student calls a classmate’s regional pronunciation ‘wrong’ even though the meaning is clear. Model a brief intervention that protects the learner and checks whether there is an actual communication problem.",
+      "coaching": "Separate differences in regional pronunciation from problems with intelligibility. Ask learners what they understood and whether anything required clarification. If a contrast changes meaning, teach that specific contrast and check it in a new example.",
+      "retry": "A learner asks to practise a different regional variety for an upcoming job interview. Invite that goal and explain the difference between variety practice and correcting a mistake."
+    },
+    "listening": {
+      "prompt": "Analyse this written listening-drill script: ‘I was going to bring it up, but we’d already gone over time, so I left it for Monday.’ What did the speaker postpone, and why?",
+      "coaching": "‘Bring it up’ means mention the issue. ‘Gone over time’ explains why the speaker postponed raising it. In a recording, listen for phrase groups and the stress landing on key information, rather than trying to hear each word as if it were read in isolation.",
+      "retry": "Paraphrase the reason and the decision in one sentence. Then choose where to place a meaningful pause if you were recording it."
+    }
+  }
+}
